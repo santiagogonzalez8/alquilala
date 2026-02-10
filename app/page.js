@@ -1,36 +1,56 @@
-'use client';
+'use client'
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { auth } from '@/lib/firebase';
-import { onAuthStateChanged } from 'firebase/auth';
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import Link from 'next/link'
+import { auth } from '@/lib/firebase'
+import { onAuthStateChanged } from 'firebase/auth'
+import styles from './page.module.css'
 
 export default function Home() {
-  const router = useRouter();
-  const [loading, setLoading] = useState(true);
+  const router = useRouter()
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (!user) {
-        router.push('/login');
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      if (!currentUser) {
+        router.push('/login')
       } else {
-        setLoading(false);
+        setLoading(false)
       }
-    });
+    })
 
-    return () => unsubscribe();
-  }, [router]);
+    return () => unsubscribe()
+  }, [router])
 
   if (loading) {
-    return <div className="loading-screen">Cargando...</div>;
+    return <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', color: '#1e3a5f' }}>Cargando...</div>
   }
 
   return (
-    <div style={{ padding: '2rem', textAlign: 'center' }}>
-      <h1 style={{ color: '#1e3a5f' }}>🏠 Bienvenido a Alquilala</h1>
-      <p style={{ marginTop: '1rem', color: '#666' }}>
-        Página principal - En construcción
-      </p>
+    <div className={styles.home}>
+      <div className={styles.heroSection}>
+        <div className={styles.heroImage}></div>
+        <div className={styles.heroContent}>
+          <div className={styles.searchContainer}>
+            <p className={styles.subtitle}>Gestión profesional de alquileres temporales</p>
+            <div className={styles.searchBar}>
+              <input 
+                type="text" 
+                placeholder="Busca propiedades asociadas en la plataforma"
+                className={styles.searchInput}
+              />
+              <Link href="/propiedades" className={styles.searchBtn}>
+                Buscar
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className={styles.content}>
+        <p className={styles.noResults}>No se encontraron propiedades</p>
+      </div>
     </div>
-  );
+  )
 }
