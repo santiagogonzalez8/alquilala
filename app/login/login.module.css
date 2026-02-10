@@ -1,0 +1,143 @@
+.container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.box {
+  background: white;
+  padding: 2.5rem;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  max-width: 400px;
+}
+
+.logo {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.box h2 {
+  text-align: center;
+  color: #1e3a5f;
+  margin-bottom: 0.5rem;
+  font-size: 2rem;
+}
+
+.subtitle {
+  text-align: center;
+  color: #666;
+  margin-bottom: 2rem;
+}
+
+.box form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.box input {
+  padding: 0.9rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+.box input:focus {
+  outline: none;
+  border-color: #1e3a5f;
+}
+
+.btnPrimary {
+  background: #1e3a5f;
+  color: white;
+  border: none;
+  padding: 1rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.btnPrimary:hover {
+  background: #2d4a6f;
+}
+
+.divider {
+  text-align: center;
+  margin: 1.5rem 0;
+  color: #999;
+  position: relative;
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 40%;
+  height: 1px;
+  background: #e0e0e0;
+}
+
+.divider::before {
+  left: 0;
+}
+
+.divider::after {
+  right: 0;
+}
+
+.btnGoogle {
+  width: 100%;
+  padding: 1rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  background: white;
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: background 0.3s;
+}
+
+.btnGoogle:hover {
+  background: #f5f5f5;
+}
+
+.btnGoogle img {
+  width: 20px;
+  height: 20px;
+}
+
+.toggleAuth {
+  text-align: center;
+  margin-top: 1.5rem;
+  color: #666;
+}
+
+.toggleAuth span {
+  color: #1e3a5f;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.toggleAuth span:hover {
+  text-decoration: underline;
+}
+
+.error {
+  background: #fee;
+  color: #c33;
+  padding: 0.8rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  text-align: center;
+}
