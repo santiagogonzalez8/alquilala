@@ -1,0 +1,90 @@
+.page {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  min-height: calc(100vh - 150px);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.header h1 {
+  color: #1e3a5f;
+}
+
+.btnAdd {
+  background: #1e3a5f;
+  color: white;
+  padding: 0.8rem 1.5rem;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.empty {
+  text-align: center;
+  padding: 4rem 2rem;
+}
+
+.empty p {
+  color: #666;
+  margin-bottom: 2rem;
+}
+
+.btnPrimary {
+  background: #1e3a5f;
+  color: white;
+  padding: 1rem 2rem;
+  border-radius: 8px;
+  text-decoration: none;
+  display: inline-block;
+  font-weight: 600;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+.card {
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.card img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.body {
+  padding: 1.5rem;
+}
+
+.body h3 {
+  color: #1e3a5f;
+  margin-bottom: 0.8rem;
+}
+
+.body p {
+  color: #666;
+  margin-bottom: 0.5rem;
+}
+
+.location {
+  margin-top: 1rem;
+}
+
+.price {
+  color: #1e3a5f;
+  font-weight: 700;
+  font-size: 1.3rem;
+  margin-top: 1rem;
+}
