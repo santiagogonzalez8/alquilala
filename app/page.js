@@ -39,8 +39,16 @@ export default function Home() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center">
-        <div className="text-white text-2xl">Cargando...</div>
+      <div style={{
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        color: 'white',
+        fontSize: '24px'
+      }}>
+        Cargando...
       </div>
     );
   }
@@ -51,108 +59,188 @@ export default function Home() {
       title: 'Mis Reservas',
       description: 'Ver tus reservas activas',
       link: '/mis-reservas',
-      color: 'from-blue-500 to-blue-600'
+      color: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
     },
     {
       icon: '🔍',
       title: 'Buscar Propiedades',
       description: 'Encuentra tu próximo hogar',
       link: '/buscar',
-      color: 'from-green-500 to-green-600'
+      color: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)'
     },
     {
       icon: '➕',
       title: 'Publicar Propiedad',
       description: 'Publica tu casa de verano',
       link: '/publicar',
-      color: 'from-purple-500 to-purple-600'
+      color: 'linear-gradient(135deg, #6a11cb 0%, #2575fc 100%)'
     },
     {
       icon: '❓',
       title: 'Ayuda',
       description: 'Preguntas frecuentes',
       link: '/ayuda',
-      color: 'from-yellow-500 to-yellow-600'
+      color: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)'
     },
     {
       icon: '💬',
       title: 'Contactar Soporte',
       description: 'Habla con nuestro equipo',
       link: '/soporte',
-      color: 'from-pink-500 to-pink-600'
+      color: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)'
     }
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-400 to-purple-500 p-6">
-      {/* Logo fijo arriba */}
-      <div className="fixed top-6 left-6 z-50 flex items-center gap-2 bg-white px-4 py-2 rounded-lg shadow-lg">
-        <span className="text-3xl">🏠</span>
-        <span className="text-2xl font-bold text-gray-800">Alquilala</span>
+    <div style={{
+      minHeight: '100vh',
+      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      padding: '24px'
+    }}>
+      {/* Logo fijo */}
+      <div style={{
+        position: 'fixed',
+        top: '24px',
+        left: '24px',
+        zIndex: 50,
+        display: 'flex',
+        alignItems: 'center',
+        gap: '8px',
+        background: 'white',
+        padding: '12px 16px',
+        borderRadius: '8px',
+        boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)'
+      }}>
+        <span style={{ fontSize: '30px' }}>🏠</span>
+        <span style={{ fontSize: '24px', fontWeight: 'bold', color: '#1f2937' }}>Alquilala</span>
       </div>
 
-      <div className="max-w-4xl mx-auto pt-24">
+      <div style={{ maxWidth: '1024px', margin: '0 auto', paddingTop: '96px' }}>
         {/* Bienvenida */}
-        <div className="bg-white rounded-lg shadow-xl p-6 mb-8">
-          <div className="flex items-center justify-between">
+        <div style={{
+          background: 'white',
+          borderRadius: '12px',
+          boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
+          padding: '24px',
+          marginBottom: '32px'
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
             <div>
-              <h1 className="text-3xl font-bold text-gray-800 mb-2">
-                ¡Bienvenido, {user?.displayName || user?.email}! 👋
+              <h1 style={{ fontSize: '30px', fontWeight: 'bold', color: '#1f2937', marginBottom: '8px' }}>
+                ¡Bienvenido, {user?.displayName || user?.email?.split('@')[0]}! 👋
               </h1>
-              <p className="text-gray-600">
+              <p style={{ color: '#6b7280' }}>
                 ¿Qué te gustaría hacer hoy?
               </p>
             </div>
             {esAdmin && (
-              <div className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-4 py-2 rounded-lg font-bold shadow-lg">
+              <div style={{
+                background: 'linear-gradient(135deg, #f97316 0%, #dc2626 100%)',
+                color: 'white',
+                padding: '8px 16px',
+                borderRadius: '8px',
+                fontWeight: 'bold',
+                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+              }}>
                 👑 ADMINISTRADOR
               </div>
             )}
           </div>
         </div>
 
-        {/* Botón de Panel de Admin (solo si es admin) */}
+        {/* Botón Admin */}
         {esAdmin && (
           <button
             onClick={() => router.push('/admin')}
-            className="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-lg shadow-xl p-6 hover:scale-105 transition-transform duration-200 mb-8"
+            style={{
+              width: '100%',
+              background: 'linear-gradient(135deg, #f97316 0%, #dc2626 100%)',
+              color: 'white',
+              borderRadius: '12px',
+              boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
+              padding: '24px',
+              marginBottom: '32px',
+              border: 'none',
+              cursor: 'pointer',
+              transition: 'transform 0.2s'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.02)'}
+            onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
           >
-            <div className="flex items-center justify-center gap-4">
-              <span className="text-5xl">👑</span>
-              <div className="text-left">
-                <h2 className="text-3xl font-bold mb-2">Panel de Administración</h2>
-                <p className="text-white/90 text-lg">Gestionar propiedades, reservas y usuarios</p>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '16px' }}>
+              <span style={{ fontSize: '48px' }}>👑</span>
+              <div style={{ textAlign: 'left' }}>
+                <h2 style={{ fontSize: '28px', fontWeight: 'bold', marginBottom: '8px' }}>Panel de Administración</h2>
+                <p style={{ opacity: 0.9, fontSize: '18px' }}>Gestionar propiedades, reservas y usuarios</p>
               </div>
             </div>
           </button>
         )}
 
-        {/* Grid de opciones del menú */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        {/* Grid de menú */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+          gap: '24px',
+          marginBottom: '32px'
+        }}>
           {menuItems.map((item, index) => (
             <button
               key={index}
               onClick={() => router.push(item.link)}
-              className={`bg-gradient-to-r ${item.color} text-white rounded-lg shadow-lg p-6 hover:scale-105 transition-transform duration-200 text-left`}
+              style={{
+                background: item.color,
+                color: 'white',
+                borderRadius: '12px',
+                boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+                padding: '24px',
+                border: 'none',
+                cursor: 'pointer',
+                textAlign: 'left',
+                transition: 'transform 0.2s'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+              onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
             >
-              <div className="flex items-start gap-4">
-                <span className="text-5xl">{item.icon}</span>
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px' }}>
+                <span style={{ fontSize: '48px' }}>{item.icon}</span>
                 <div>
-                  <h2 className="text-2xl font-bold mb-2">{item.title}</h2>
-                  <p className="text-white/90">{item.description}</p>
+                  <h2 style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '8px' }}>{item.title}</h2>
+                  <p style={{ opacity: 0.9 }}>{item.description}</p>
                 </div>
               </div>
             </button>
           ))}
         </div>
 
-        {/* Botón de cerrar sesión */}
-        <div className="bg-white rounded-lg shadow-xl p-6">
+        {/* Cerrar sesión */}
+        <div style={{
+          background: 'white',
+          borderRadius: '12px',
+          boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
+          padding: '24px'
+        }}>
           <button
             onClick={handleLogout}
-            className="w-full flex items-center justify-center gap-3 bg-red-500 hover:bg-red-600 text-white font-semibold py-3 rounded-lg transition"
+            style={{
+              width: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '12px',
+              background: '#ef4444',
+              color: 'white',
+              fontWeight: '600',
+              padding: '12px',
+              borderRadius: '8px',
+              border: 'none',
+              cursor: 'pointer',
+              transition: 'background 0.2s'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.background = '#dc2626'}
+            onMouseLeave={(e) => e.currentTarget.style.background = '#ef4444'}
           >
-            <span className="text-2xl">🚪</span>
+            <span style={{ fontSize: '24px' }}>🚪</span>
             <span>Cerrar Sesión</span>
           </button>
         </div>
