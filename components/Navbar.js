@@ -123,11 +123,6 @@ export default function Navbar() {
               
               <div className={styles.divider}></div>
               
-              <Link href="/propiedades" className={styles.menuItem} onClick={() => setMenuOpen(false)}>
-                <span>🔍</span>
-                Buscar Propiedades
-              </Link>
-              
               <Link href="/publicar" className={styles.menuItem} onClick={() => setMenuOpen(false)}>
                 <span>➕</span>
                 Publicar Propiedad
@@ -140,9 +135,9 @@ export default function Navbar() {
                 Ayuda
               </Link>
               
-              <Link href="/contactar" className={styles.menuItem} onClick={() => setMenuOpen(false)}>
+              <Link href="/soporte" className={styles.menuItem} onClick={() => setMenuOpen(false)}>
                 <span>💬</span>
-                Contactar Soporte
+                Contáctanos
               </Link>
               
               <div className={styles.divider}></div>
