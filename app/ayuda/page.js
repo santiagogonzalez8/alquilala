@@ -1,71 +1,108 @@
 'use client';
-import BackButton from '@/components/BackButton';
+import styles from '../page.module.css';
 
 export default function Ayuda() {
   const faqs = [
     {
       pregunta: '¿Cómo publico una propiedad?',
-      respuesta: 'Ve a la sección "Publicar Propiedad" del menú principal, completa el formulario con los datos de tu propiedad y haz clic en "Publicar".'
+      respuesta: 'Ve a la sección "Publicar Propiedad" del menú, completa el formulario con los datos de tu casa y haz clic en "Publicar". Tu propiedad estará disponible inmediatamente.'
     },
     {
-      pregunta: '¿Cómo busco propiedades?',
-      respuesta: 'En la sección "Buscar Propiedades" puedes filtrar por ubicación, precio y características. Usa el buscador para encontrar lo que necesitas.'
+      pregunta: '¿Cómo veo mis propiedades publicadas?',
+      respuesta: 'En la sección "Buscar Propiedades" (o "Mis Propiedades") puedes ver todas las casas que has publicado en la plataforma.'
     },
     {
-      pregunta: '¿Cómo hago una reserva?',
-      respuesta: 'Selecciona la propiedad que te interesa, revisa los detalles y haz clic en "Reservar". Recibirás una confirmación por email.'
+      pregunta: '¿Cuánto cuesta publicar?',
+      respuesta: 'Publicar tu propiedad en Alquilala es completamente gratuito. Solo cobramos una comisión cuando se concrete una reserva.'
     },
     {
-      pregunta: '¿Puedo cancelar una reserva?',
-      respuesta: 'Sí, ve a "Mis Reservas" y selecciona la reserva que deseas cancelar. Ten en cuenta las políticas de cancelación de cada propiedad.'
+      pregunta: '¿Puedo modificar mi publicación?',
+      respuesta: 'Sí, desde el panel de administración puedes editar los datos de tu propiedad en cualquier momento.'
     },
     {
-      pregunta: '¿Es seguro el pago?',
-      respuesta: 'Todas las transacciones están protegidas y encriptadas. Trabajamos con plataformas de pago seguras para garantizar tu protección.'
+      pregunta: '¿Cómo me contactan los interesados?',
+      respuesta: 'Cuando alguien esté interesado en tu propiedad, recibirás una notificación por email con los datos de contacto.'
     },
     {
-      pregunta: '¿Cómo contacto al propietario?',
-      respuesta: 'Una vez realizada la reserva, recibirás los datos de contacto del propietario en tu correo electrónico.'
+      pregunta: '¿Qué información necesito para publicar?',
+      respuesta: 'Necesitas: título descriptivo, ubicación, precio por noche, número de huéspedes, dormitorios, baños, amenidades y una descripción detallada.'
     }
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-400 to-purple-500 p-6">
-      <BackButton />
-      
-      <div className="max-w-4xl mx-auto pt-20">
-        <div className="bg-white rounded-lg shadow-xl p-8">
-          <div className="flex items-center gap-3 mb-6">
-            <span className="text-4xl">❓</span>
-            <h1 className="text-3xl font-bold text-gray-800">Centro de Ayuda</h1>
+    <div className={styles.home}>
+      <div className={styles.heroSection}>
+        <div className={styles.heroImage}></div>
+        <div className={styles.heroContent}>
+          <div className={styles.searchContainer}>
+            <h1 style={{fontSize: '2.5rem', color: 'white', marginBottom: '1rem'}}>❓ Centro de Ayuda</h1>
+            <p className={styles.subtitle}>Encuentra respuestas a tus preguntas</p>
           </div>
+        </div>
+      </div>
 
-          <p className="text-gray-600 mb-8">
-            Encuentra respuestas a las preguntas más frecuentes sobre Alquilala
-          </p>
+      <div className={styles.content} style={{maxWidth: '900px', margin: '0 auto', padding: '2rem'}}>
+        <div style={{background: 'white', padding: '2rem', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)'}}>
+          <h2 style={{fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '1.5rem', color: '#1e3a5f'}}>
+            Preguntas Frecuentes
+          </h2>
 
-          <div className="space-y-4">
+          <div style={{display: 'flex', flexDirection: 'column', gap: '1rem'}}>
             {faqs.map((faq, index) => (
-              <details key={index} className="bg-gray-50 rounded-lg p-4 cursor-pointer hover:bg-gray-100 transition">
-                <summary className="font-semibold text-lg text-gray-800 cursor-pointer">
+              <details key={index} style={{
+                background: '#f9fafb',
+                padding: '1rem',
+                borderRadius: '8px',
+                cursor: 'pointer'
+              }}>
+                <summary style={{
+                  fontWeight: 'bold',
+                  fontSize: '1.125rem',
+                  color: '#1e3a5f',
+                  cursor: 'pointer',
+                  userSelect: 'none'
+                }}>
                   {faq.pregunta}
                 </summary>
-                <p className="mt-3 text-gray-600 pl-4">
+                <p style={{
+                  marginTop: '0.75rem',
+                  paddingLeft: '1rem',
+                  color: '#6b7280',
+                  lineHeight: '1.6'
+                }}>
                   {faq.respuesta}
                 </p>
               </details>
             ))}
           </div>
 
-          <div className="mt-8 p-6 bg-blue-50 rounded-lg border border-blue-200">
-            <h3 className="font-bold text-lg mb-2 text-blue-900">¿No encontraste lo que buscabas?</h3>
-            <p className="text-blue-700 mb-4">Nuestro equipo de soporte está aquí para ayudarte</p>
-            <button
-              onClick={() => window.location.href = '/soporte'}
-              className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition"
+          <div style={{
+            marginTop: '2rem',
+            padding: '1.5rem',
+            background: 'linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%)',
+            borderRadius: '8px',
+            border: '2px solid #3b82f6'
+          }}>
+            <h3 style={{fontWeight: 'bold', fontSize: '1.125rem', marginBottom: '0.5rem', color: '#1e40af'}}>
+              ¿No encontraste lo que buscabas?
+            </h3>
+            <p style={{color: '#1e40af', marginBottom: '1rem'}}>
+              Nuestro equipo está aquí para ayudarte
+            </p>
+            <a
+              href="/soporte"
+              style={{
+                display: 'inline-block',
+                background: '#3b82f6',
+                color: 'white',
+                padding: '0.75rem 1.5rem',
+                borderRadius: '8px',
+                textDecoration: 'none',
+                fontWeight: 'bold'
+              }}
             >
-              Contactar Soporte
-            </button>
+              Contáctanos
+            </a>
           </div>
         </div>
       </div>

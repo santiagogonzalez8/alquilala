@@ -2,25 +2,37 @@
 import { useState } from 'react';
 import { auth, db } from '@/lib/firebase';
 import { collection, addDoc } from 'firebase/firestore';
-import BackButton from '@/components/BackButton';
+import { useRouter } from 'next/navigation';
+import styles from '../page.module.css';
 
 export default function PublicarPropiedad() {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     titulo: '',
     ubicacion: '',
-    precio: '',
+    precioPorNoche: '',
     descripcion: '',
-    habitaciones: '',
-    banos: ''
+    huespedes: '',
+    dormitorios: '',
+    camas: '',
+    banos: '',
+    tipoPropiedad: 'Casa',
+    amenities: []
   });
   const [loading, setLoading] = useState(false);
+
+  const amenitiesDisponibles = [
+    'Piscina', 'Vista a la playa', 'WiFi', 'Aire acondicionado', 
+    'Parrillero', 'Estacionamiento', 'Cocina equipada', 'TV', 
+    'Jardín', 'Terraza', 'Lavadora', 'Secadora'
+  ];
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (!auth.currentUser) {
       alert('Debes iniciar sesión para publicar');
-      window.location.href = '/login';
+      router.push('/login');
       return;
     }
 
@@ -32,18 +44,12 @@ export default function PublicarPropiedad() {
         userId: auth.currentUser.uid,
         userEmail: auth.currentUser.email,
         fechaPublicacion: new Date().toISOString(),
-        estado: 'activa'
+        estado: 'disponible',
+        temporada: 'verano'
       });
 
       alert('¡Propiedad publicada exitosamente!');
-      setFormData({
-        titulo: '',
-        ubicacion: '',
-        precio: '',
-        descripcion: '',
-        habitaciones: '',
-        banos: ''
-      });
+      router.push('/');
     } catch (error) {
       console.error('Error al publicar:', error);
       alert('Error al publicar la propiedad');
@@ -59,107 +65,198 @@ export default function PublicarPropiedad() {
     });
   };
 
+  const toggleAmenity = (amenity) => {
+    setFormData(prev => ({
+      ...prev,
+      amenities: prev.amenities.includes(amenity)
+        ? prev.amenities.filter(a => a !== amenity)
+        : [...prev.amenities, amenity]
+    }));
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-400 to-purple-500 p-6">
-      <BackButton />
-      
-      <div className="max-w-2xl mx-auto pt-20">
-        <div className="bg-white rounded-lg shadow-xl p-8">
-          <div className="flex items-center gap-3 mb-6">
-            <span className="text-4xl">➕</span>
-            <h1 className="text-3xl font-bold text-gray-800">Publicar Propiedad</h1>
+    <div className={styles.home}>
+      <div className={styles.heroSection}>
+        <div className={styles.heroImage}></div>
+        <div className={styles.heroContent}>
+          <div className={styles.searchContainer}>
+            <h1 style={{fontSize: '2.5rem', color: 'white', marginBottom: '1rem'}}>🏖️ Publicar Propiedad de Verano</h1>
+            <p className={styles.subtitle}>Alquila tu casa para las vacaciones</p>
+          </div>
+        </div>
+      </div>
+
+      <div className={styles.content} style={{maxWidth: '800px', margin: '0 auto', padding: '2rem'}}>
+        <form onSubmit={handleSubmit} style={{background: 'white', padding: '2rem', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)'}}>
+          
+          <div style={{marginBottom: '1.5rem'}}>
+            <label style={{display: 'block', fontWeight: 'bold', marginBottom: '0.5rem', color: '#1e3a5f'}}>Título del anuncio *</label>
+            <input
+              type="text"
+              name="titulo"
+              value={formData.titulo}
+              onChange={handleChange}
+              required
+              placeholder="Ej: Casa en Punta Negra con piscina y vista al mar"
+              style={{width: '100%', padding: '0.75rem', border: '2px solid #e5e7eb', borderRadius: '8px', fontSize: '1rem'}}
+            />
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <div style={{marginBottom: '1.5rem'}}>
+            <label style={{display: 'block', fontWeight: 'bold', marginBottom: '0.5rem', color: '#1e3a5f'}}>Ubicación *</label>
+            <input
+              type="text"
+              name="ubicacion"
+              value={formData.ubicacion}
+              onChange={handleChange}
+              required
+              placeholder="Ej: Punta Negra, Maldonado"
+              style={{width: '100%', padding: '0.75rem', border: '2px solid #e5e7eb', borderRadius: '8px', fontSize: '1rem'}}
+            />
+          </div>
+
+          <div style={{marginBottom: '1.5rem'}}>
+            <label style={{display: 'block', fontWeight: 'bold', marginBottom: '0.5rem', color: '#1e3a5f'}}>Tipo de propiedad *</label>
+            <select
+              name="tipoPropiedad"
+              value={formData.tipoPropiedad}
+              onChange={handleChange}
+              required
+              style={{width: '100%', padding: '0.75rem', border: '2px solid #e5e7eb', borderRadius: '8px', fontSize: '1rem'}}
+            >
+              <option value="Casa">Casa</option>
+              <option value="Apartamento">Apartamento</option>
+              <option value="Cabaña">Cabaña</option>
+              <option value="Chalet">Chalet</option>
+            </select>
+          </div>
+
+          <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.5rem'}}>
             <div>
-              <label className="block text-gray-700 font-semibold mb-2">Título</label>
+              <label style={{display: 'block', fontWeight: 'bold', marginBottom: '0.5rem', color: '#1e3a5f'}}>Precio por noche (USD) *</label>
               <input
-                type="text"
-                name="titulo"
-                value={formData.titulo}
+                type="number"
+                name="precioPorNoche"
+                value={formData.precioPorNoche}
                 onChange={handleChange}
                 required
-                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Ej: Apartamento céntrico 2 dormitorios"
+                placeholder="250"
+                style={{width: '100%', padding: '0.75rem', border: '2px solid #e5e7eb', borderRadius: '8px', fontSize: '1rem'}}
               />
             </div>
 
             <div>
-              <label className="block text-gray-700 font-semibold mb-2">Ubicación</label>
+              <label style={{display: 'block', fontWeight: 'bold', marginBottom: '0.5rem', color: '#1e3a5f'}}>Huéspedes *</label>
               <input
-                type="text"
-                name="ubicacion"
-                value={formData.ubicacion}
+                type="number"
+                name="huespedes"
+                value={formData.huespedes}
                 onChange={handleChange}
                 required
-                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Ej: Montevideo, Centro"
+                placeholder="6"
+                style={{width: '100%', padding: '0.75rem', border: '2px solid #e5e7eb', borderRadius: '8px', fontSize: '1rem'}}
+              />
+            </div>
+          </div>
+
+          <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem', marginBottom: '1.5rem'}}>
+            <div>
+              <label style={{display: 'block', fontWeight: 'bold', marginBottom: '0.5rem', color: '#1e3a5f'}}>Dormitorios *</label>
+              <input
+                type="number"
+                name="dormitorios"
+                value={formData.dormitorios}
+                onChange={handleChange}
+                required
+                placeholder="3"
+                style={{width: '100%', padding: '0.75rem', border: '2px solid #e5e7eb', borderRadius: '8px', fontSize: '1rem'}}
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-gray-700 font-semibold mb-2">Precio (USD/mes)</label>
-                <input
-                  type="number"
-                  name="precio"
-                  value={formData.precio}
-                  onChange={handleChange}
-                  required
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="500"
-                />
-              </div>
-
-              <div>
-                <label className="block text-gray-700 font-semibold mb-2">Habitaciones</label>
-                <input
-                  type="number"
-                  name="habitaciones"
-                  value={formData.habitaciones}
-                  onChange={handleChange}
-                  required
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="2"
-                />
-              </div>
+            <div>
+              <label style={{display: 'block', fontWeight: 'bold', marginBottom: '0.5rem', color: '#1e3a5f'}}>Camas *</label>
+              <input
+                type="number"
+                name="camas"
+                value={formData.camas}
+                onChange={handleChange}
+                required
+                placeholder="4"
+                style={{width: '100%', padding: '0.75rem', border: '2px solid #e5e7eb', borderRadius: '8px', fontSize: '1rem'}}
+              />
             </div>
 
             <div>
-              <label className="block text-gray-700 font-semibold mb-2">Baños</label>
+              <label style={{display: 'block', fontWeight: 'bold', marginBottom: '0.5rem', color: '#1e3a5f'}}>Baños *</label>
               <input
                 type="number"
                 name="banos"
                 value={formData.banos}
                 onChange={handleChange}
                 required
-                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="1"
+                placeholder="2"
+                style={{width: '100%', padding: '0.75rem', border: '2px solid #e5e7eb', borderRadius: '8px', fontSize: '1rem'}}
               />
             </div>
+          </div>
 
-            <div>
-              <label className="block text-gray-700 font-semibold mb-2">Descripción</label>
-              <textarea
-                name="descripcion"
-                value={formData.descripcion}
-                onChange={handleChange}
-                required
-                rows="4"
-                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Describe tu propiedad..."
-              />
+          <div style={{marginBottom: '1.5rem'}}>
+            <label style={{display: 'block', fontWeight: 'bold', marginBottom: '0.5rem', color: '#1e3a5f'}}>Amenidades</label>
+            <div style={{display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.5rem'}}>
+              {amenitiesDisponibles.map(amenity => (
+                <button
+                  key={amenity}
+                  type="button"
+                  onClick={() => toggleAmenity(amenity)}
+                  style={{
+                    padding: '0.75rem',
+                    borderRadius: '8px',
+                    border: formData.amenities.includes(amenity) ? '2px solid #3b82f6' : '2px solid #e5e7eb',
+                    background: formData.amenities.includes(amenity) ? '#3b82f6' : 'white',
+                    color: formData.amenities.includes(amenity) ? 'white' : '#1e3a5f',
+                    cursor: 'pointer',
+                    fontSize: '0.875rem',
+                    fontWeight: '500'
+                  }}
+                >
+                  {amenity}
+                </button>
+              ))}
             </div>
+          </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition"
-            >
-              {loading ? 'Publicando...' : 'Publicar Propiedad'}
-            </button>
-          </form>
-        </div>
+          <div style={{marginBottom: '1.5rem'}}>
+            <label style={{display: 'block', fontWeight: 'bold', marginBottom: '0.5rem', color: '#1e3a5f'}}>Descripción *</label>
+            <textarea
+              name="descripcion"
+              value={formData.descripcion}
+              onChange={handleChange}
+              required
+              rows="5"
+              placeholder="Describe tu propiedad: ubicación exacta, características especiales, que incluye, reglas de la casa..."
+              style={{width: '100%', padding: '0.75rem', border: '2px solid #e5e7eb', borderRadius: '8px', fontSize: '1rem', fontFamily: 'inherit'}}
+            />
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading}
+            style={{
+              width: '100%',
+              background: 'linear-gradient(135deg, #3b82f6 0%, #1e40af 100%)',
+              color: 'white',
+              padding: '1rem',
+              borderRadius: '8px',
+              border: 'none',
+              fontSize: '1.125rem',
+              fontWeight: 'bold',
+              cursor: loading ? 'not-allowed' : 'pointer',
+              opacity: loading ? 0.6 : 1
+            }}
+          >
+            {loading ? 'Publicando...' : '🏖️ Publicar Propiedad de Verano'}
+          </button>
+        </form>
       </div>
     </div>
   );
