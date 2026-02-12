@@ -203,4 +203,83 @@ export default function Home() {
             fontWeight: 'bold'
           }}
           onMouseEnter={(e) => {
-            e.target.style.transform = 'translateY(-50%)
+            e.target.style.transform = 'translateY(-50%) scale(1.15)';
+            e.target.style.background = '#1e3a5f';
+            e.target.style.color = 'white';
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.transform = 'translateY(-50%) scale(1)';
+            e.target.style.background = 'rgba(255, 255, 255, 0.95)';
+            e.target.style.color = '#1e3a5f';
+          }}
+        >
+          →
+        </button>
+
+        {/* BARRA DE BÚSQUEDA Y TEXTO - ABAJO (justo arriba de los indicadores) */}
+        <div style={{
+          position: 'absolute',
+          bottom: '5.5rem',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          width: '90%',
+          maxWidth: '700px',
+          zIndex: 15,
+          textAlign: 'center'
+        }}>
+          <p style={{
+            color: 'white',
+            fontSize: '1.25rem',
+            fontWeight: '600',
+            marginBottom: '1.5rem',
+            textShadow: '0 2px 4px rgba(0,0,0,0.5)'
+          }}>
+            Gestión profesional de alquileres temporales
+          </p>
+          <div className={styles.searchBar}>
+            <input 
+              type="text" 
+              placeholder="Busca propiedades asociadas en la plataforma"
+              className={styles.searchInput}
+            />
+            <Link href="/mis-propiedades" className={styles.searchBtn}>
+              Buscar
+            </Link>
+          </div>
+        </div>
+
+        {/* Indicadores de posición - ABAJO */}
+        <div style={{
+          position: 'absolute',
+          bottom: '2rem',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          display: 'flex',
+          gap: '0.75rem',
+          zIndex: 20
+        }}>
+          {slides.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => setCurrentSlide(index)}
+              style={{
+                width: currentSlide === index ? '40px' : '12px',
+                height: '12px',
+                borderRadius: '6px',
+                border: '2px solid white',
+                background: currentSlide === index ? '#1e3a5f' : 'rgba(255, 255, 255, 0.6)',
+                cursor: 'pointer',
+                transition: 'all 0.3s',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+              }}
+            />
+          ))}
+        </div>
+      </div>
+
+      <div className={styles.content}>
+        <p className={styles.noResults}>No se encontraron propiedades</p>
+      </div>
+    </div>
+  )
+}
