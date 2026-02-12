@@ -12,6 +12,30 @@ export default function Home() {
   const [loading, setLoading] = useState(true)
   const [user, setUser] = useState(null)
   const [esAdmin, setEsAdmin] = useState(false)
+  const [currentSlide, setCurrentSlide] = useState(0)
+
+  const slides = [
+    {
+      name: 'Punta del Este',
+      image: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=1600&h=800&fit=crop&q=80'
+    },
+    {
+      name: 'Cabo Polonio',
+      image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1600&h=800&fit=crop&q=80'
+    },
+    {
+      name: 'Punta del Diablo',
+      image: 'https://images.unsplash.com/photo-1519046904884-53103b34b206?w=1600&h=800&fit=crop&q=80'
+    },
+    {
+      name: 'La Paloma',
+      image: 'https://images.unsplash.com/photo-1505142468610-359e7d316be0?w=1600&h=800&fit=crop&q=80'
+    },
+    {
+      name: 'Colonia del Sacramento',
+      image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1600&h=800&fit=crop&q=80'
+    }
+  ]
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -27,13 +51,20 @@ export default function Home() {
     return () => unsubscribe()
   }, [router])
 
+  const nextSlide = () => {
+    setCurrentSlide((prev) => (prev + 1) % slides.length)
+  }
+
+  const prevSlide = () => {
+    setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length)
+  }
+
   if (loading) {
     return <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', color: '#1e3a5f' }}>Cargando...</div>
   }
 
   return (
     <div className={styles.home}>
-      {/* Botón de Admin con OLA - solo visible para gosanti2000@gmail.com */}
       {esAdmin && (
         <button 
           onClick={() => router.push('/admin')}
@@ -69,8 +100,152 @@ export default function Home() {
         </button>
       )}
 
-      <div className={styles.heroSection}>
-        <div className={styles.heroImage}></div>
+      <div className={styles.heroSection} style={{position: 'relative'}}>
+        {/* Carrusel de imágenes */}
+        {slides.map((slide, index) => (
+          <div
+            key={index}
+            className={styles.heroImage}
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              backgroundImage: `linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url(${slide.image})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              opacity: currentSlide === index ? 1 : 0,
+              transition: 'opacity 0.8s ease',
+              zIndex: currentSlide === index ? 1 : 0
+            }}
+          >
+            {/* Nombre del lugar */}
+            {currentSlide === index && (
+              <div style={{
+                position: 'absolute',
+                top: '2.5rem',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                background: 'rgba(30, 58, 95, 0.95)',
+                color: 'white',
+                padding: '0.875rem 2.5rem',
+                borderRadius: '12px',
+                fontSize: '1.75rem',
+                fontWeight: 'bold',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+                zIndex: 10
+              }}>
+                {slide.name}
+              </div>
+            )}
+          </div>
+        ))}
+
+        {/* Botón anterior */}
+        <button
+          onClick={prevSlide}
+          style={{
+            position: 'absolute',
+            left: '2rem',
+            top: '50%',
+            transform: 'translateY(-50%)',
+            background: 'rgba(255, 255, 255, 0.95)',
+            border: '2px solid #1e3a5f',
+            borderRadius: '50%',
+            width: '55px',
+            height: '55px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            fontSize: '1.75rem',
+            color: '#1e3a5f',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
+            zIndex: 10,
+            transition: 'all 0.2s',
+            fontWeight: 'bold'
+          }}
+          onMouseEnter={(e) => {
+            e.target.style.transform = 'translateY(-50%) scale(1.15)';
+            e.target.style.background = '#1e3a5f';
+            e.target.style.color = 'white';
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.transform = 'translateY(-50%) scale(1)';
+            e.target.style.background = 'rgba(255, 255, 255, 0.95)';
+            e.target.style.color = '#1e3a5f';
+          }}
+        >
+          ←
+        </button>
+
+        {/* Botón siguiente */}
+        <button
+          onClick={nextSlide}
+          style={{
+            position: 'absolute',
+            right: '2rem',
+            top: '50%',
+            transform: 'translateY(-50%)',
+            background: 'rgba(255, 255, 255, 0.95)',
+            border: '2px solid #1e3a5f',
+            borderRadius: '50%',
+            width: '55px',
+            height: '55px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            fontSize: '1.75rem',
+            color: '#1e3a5f',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
+            zIndex: 10,
+            transition: 'all 0.2s',
+            fontWeight: 'bold'
+          }}
+          onMouseEnter={(e) => {
+            e.target.style.transform = 'translateY(-50%) scale(1.15)';
+            e.target.style.background = '#1e3a5f';
+            e.target.style.color = 'white';
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.transform = 'translateY(-50%) scale(1)';
+            e.target.style.background = 'rgba(255, 255, 255, 0.95)';
+            e.target.style.color = '#1e3a5f';
+          }}
+        >
+          →
+        </button>
+
+        {/* Indicadores de posición */}
+        <div style={{
+          position: 'absolute',
+          bottom: '2rem',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          display: 'flex',
+          gap: '0.75rem',
+          zIndex: 10
+        }}>
+          {slides.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => setCurrentSlide(index)}
+              style={{
+                width: currentSlide === index ? '40px' : '12px',
+                height: '12px',
+                borderRadius: '6px',
+                border: '2px solid white',
+                background: currentSlide === index ? '#1e3a5f' : 'rgba(255, 255, 255, 0.6)',
+                cursor: 'pointer',
+                transition: 'all 0.3s',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+              }}
+            />
+          ))}
+        </div>
+
         <div className={styles.heroContent}>
           <div className={styles.searchContainer}>
             <p className={styles.subtitle}>Gestión profesional de alquileres temporales</p>
@@ -80,7 +255,7 @@ export default function Home() {
                 placeholder="Busca propiedades asociadas en la plataforma"
                 className={styles.searchInput}
               />
-              <Link href="/propiedades" className={styles.searchBtn}>
+              <Link href="/mis-propiedades" className={styles.searchBtn}>
                 Buscar
               </Link>
             </div>
