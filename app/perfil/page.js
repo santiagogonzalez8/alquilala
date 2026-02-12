@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from 'react'
 import { auth, db, storage } from '@/lib/firebase'
-import { doc, getDoc, setDoc } from 'firebase/firestore'
+import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore'
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
-import { updatePassword } from 'firebase/auth'
+import { updatePassword, updateProfile } from 'firebase/auth'
 import styles from './perfil.module.css'
 
 export default function Perfil() {
@@ -43,6 +43,7 @@ export default function Perfil() {
           photoURL: auth.currentUser.photoURL || ''
         }
         setUserData(initialData)
+        await setDoc(doc(db, 'users', auth.currentUser.uid), initialData)
       }
     } catch (error) {
       console.error('Error:', error)
@@ -71,11 +72,13 @@ export default function Perfil() {
       await uploadBytes(storageRef, file)
       const photoURL = await getDownloadURL(storageRef)
       
+      await updateProfile(auth.currentUser, { photoURL })
+      
       const newData = { ...userData, photoURL }
       setUserData(newData)
       
-      await setDoc(doc(db, 'users', auth.currentUser.uid), {
-        ...newData,
+      await updateDoc(doc(db, 'users', auth.currentUser.uid), {
+        photoURL,
         updatedAt: new Date()
       })
       
@@ -92,7 +95,11 @@ export default function Perfil() {
     e.preventDefault()
     
     try {
-      await setDoc(doc(db, 'users', auth.currentUser.uid), {
+      await updateProfile(auth.currentUser, {
+        displayName: userData.displayName
+      })
+
+      await updateDoc(doc(db, 'users', auth.currentUser.uid), {
         ...userData,
         updatedAt: new Date()
       })
@@ -159,7 +166,7 @@ export default function Perfil() {
             gap: '0.5rem',
             fontWeight: 'bold'
           }}>
-            ✅ Perfil actualizado
+            ✅ Tu perfil se ha actualizado correctamente
           </div>
         )}
 

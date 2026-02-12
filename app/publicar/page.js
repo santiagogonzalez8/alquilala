@@ -20,7 +20,7 @@ export default function PublicarPropiedad() {
     amenities: []
   });
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const amenitiesDisponibles = [
     'Piscina', 'Vista a la playa', 'WiFi', 'Aire acondicionado', 
@@ -38,13 +38,8 @@ export default function PublicarPropiedad() {
     }
 
     setLoading(true);
-    setError('');
 
     try {
-      console.log('Intentando publicar propiedad...');
-      console.log('Usuario:', auth.currentUser.email);
-      console.log('Datos:', formData);
-
       const propiedadData = {
         ...formData,
         userId: auth.currentUser.uid,
@@ -54,23 +49,17 @@ export default function PublicarPropiedad() {
         temporada: 'verano'
       };
 
-      const docRef = await addDoc(collection(db, 'propiedades'), propiedadData);
+      await addDoc(collection(db, 'propiedades'), propiedadData);
       
-      console.log('Propiedad publicada con ID:', docRef.id);
-
-      // Mostrar mensaje de éxito
-      alert('🎉 ¡Propiedad publicada exitosamente!');
+      setShowSuccess(true);
       
-      // Redirigir a mis propiedades
-      router.push('/mis-propiedades');
+      setTimeout(() => {
+        router.push('/mis-propiedades');
+      }, 2000);
       
     } catch (error) {
       console.error('Error completo:', error);
-      console.error('Código de error:', error.code);
-      console.error('Mensaje:', error.message);
-      
-      setError(`Error al publicar: ${error.message}`);
-      alert(`Error al publicar la propiedad: ${error.message}`);
+      alert(`Error al publicar: ${error.message}`);
     } finally {
       setLoading(false);
     }
@@ -94,30 +83,35 @@ export default function PublicarPropiedad() {
 
   return (
     <div className={styles.home}>
+      {showSuccess && (
+        <div style={{
+          position: 'fixed',
+          top: '20px',
+          right: '20px',
+          background: '#10b981',
+          color: 'white',
+          padding: '1rem 1.5rem',
+          borderRadius: '8px',
+          boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+          zIndex: 1000,
+          fontWeight: 'bold',
+          animation: 'slideIn 0.3s ease'
+        }}>
+          ✅ Tu propiedad se ha publicado correctamente
+        </div>
+      )}
+
       <div className={styles.heroSection}>
         <div className={styles.heroImage}></div>
         <div className={styles.heroContent}>
           <div className={styles.searchContainer}>
-            <h1 style={{fontSize: '2.5rem', color: 'white', marginBottom: '1rem'}}>🏖️ Publicar Propiedad de Verano</h1>
+            <h1 style={{fontSize: '2.5rem', color: 'white', marginBottom: '1rem'}}>Publicar Propiedad</h1>
             <p className={styles.subtitle}>Alquila tu casa para las vacaciones</p>
           </div>
         </div>
       </div>
 
       <div className={styles.content} style={{maxWidth: '800px', margin: '0 auto', padding: '2rem'}}>
-        {error && (
-          <div style={{
-            background: '#fee2e2',
-            color: '#991b1b',
-            padding: '1rem',
-            borderRadius: '8px',
-            marginBottom: '1rem',
-            fontWeight: 'bold'
-          }}>
-            {error}
-          </div>
-        )}
-
         <form onSubmit={handleSubmit} style={{background: 'white', padding: '2rem', borderRadius: '12px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)'}}>
           
           <div style={{marginBottom: '1.5rem'}}>
@@ -279,26 +273,40 @@ export default function PublicarPropiedad() {
             disabled={loading}
             style={{
               width: '100%',
-              background: loading ? '#9ca3af' : 'linear-gradient(135deg, #3b82f6 0%, #1e40af 100%)',
+              background: loading ? '#9ca3af' : '#1e3a5f',
               color: 'white',
               padding: '1rem',
               borderRadius: '8px',
               border: 'none',
               fontSize: '1.125rem',
               fontWeight: 'bold',
-              cursor: loading ? 'not-allowed' : 'pointer'
+              cursor: loading ? 'not-allowed' : 'pointer',
+              transition: 'all 0.2s'
+            }}
+            onMouseEnter={(e) => {
+              if (!loading) e.target.style.background = '#0f2942';
+            }}
+            onMouseLeave={(e) => {
+              if (!loading) e.target.style.background = '#1e3a5f';
             }}
           >
-            {loading ? '⏳ Publicando...' : '🏖️ Publicar Propiedad de Verano'}
+            {loading ? 'Publicando...' : 'Publicar Propiedad'}
           </button>
-
-          {loading && (
-            <p style={{textAlign: 'center', color: '#6b7280', marginTop: '1rem', fontSize: '0.875rem'}}>
-              Esto puede tardar unos segundos...
-            </p>
-          )}
         </form>
       </div>
+
+      <style jsx>{`
+        @keyframes slideIn {
+          from {
+            transform: translateX(100%);
+            opacity: 0;
+          }
+          to {
+            transform: translateX(0);
+            opacity: 1;
+          }
+        }
+      `}</style>
     </div>
   );
 }

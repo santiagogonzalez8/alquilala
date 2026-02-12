@@ -15,12 +15,15 @@ export default function Navbar() {
   const [userData, setUserData] = useState(null)
 
   useEffect(() => {
-    const currentUser = auth.currentUser
-    setUser(currentUser)
-    
-    if (currentUser) {
-      loadUserData(currentUser.uid)
-    }
+    const unsubscribe = auth.onAuthStateChanged(async (currentUser) => {
+      setUser(currentUser)
+      
+      if (currentUser) {
+        await loadUserData(currentUser.uid)
+      }
+    })
+
+    return () => unsubscribe()
   }, [])
 
   const loadUserData = async (uid) => {
@@ -28,6 +31,11 @@ export default function Navbar() {
       const userDoc = await getDoc(doc(db, 'users', uid))
       if (userDoc.exists()) {
         setUserData(userDoc.data())
+      } else {
+        setUserData({
+          displayName: auth.currentUser.displayName,
+          photoURL: auth.currentUser.photoURL
+        })
       }
     } catch (error) {
       console.error('Error:', error)
@@ -48,7 +56,14 @@ export default function Navbar() {
     if (userData?.displayName) {
       return userData.displayName.charAt(0).toUpperCase()
     }
+    if (user?.displayName) {
+      return user.displayName.charAt(0).toUpperCase()
+    }
     return user?.email ? user.email.charAt(0).toUpperCase() : 'U'
+  }
+
+  const getPhotoURL = () => {
+    return userData?.photoURL || user?.photoURL || null
   }
 
   return (
@@ -74,8 +89,8 @@ export default function Navbar() {
             <span></span>
             <span></span>
           </div>
-          {userData?.photoURL ? (
-            <img src={userData.photoURL} alt="User" className={styles.userThumb} />
+          {getPhotoURL() ? (
+            <img src={getPhotoURL()} alt="User" className={styles.userThumb} />
           ) : (
             <div className={styles.userThumb}>
               {getUserInitials()}
@@ -91,15 +106,15 @@ export default function Navbar() {
           <div className={styles.menu}>
             <div className={styles.menuHeader}>
               <div className={styles.menuUserInfo}>
-                {userData?.photoURL ? (
-                  <img src={userData.photoURL} alt="User" className={styles.menuPhoto} />
+                {getPhotoURL() ? (
+                  <img src={getPhotoURL()} alt="User" className={styles.menuPhoto} />
                 ) : (
                   <div className={styles.menuPhoto}>
                     {getUserInitials()}
                   </div>
                 )}
                 <div>
-                  <p className={styles.menuName}>{userData?.displayName || 'Usuario'}</p>
+                  <p className={styles.menuName}>{userData?.displayName || user?.displayName || 'Usuario'}</p>
                   <p className={styles.menuEmail}>{user?.email}</p>
                 </div>
               </div>

@@ -1,16 +1,19 @@
 .container {
   min-height: 100vh;
+  height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: white;
   padding: 2rem;
+  overflow: hidden;
 }
 
 .loginBox {
   background: white;
+  border: 2px solid #e5e7eb;
   border-radius: 16px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
   padding: 3rem;
   width: 100%;
   max-width: 440px;
