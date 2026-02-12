@@ -24,6 +24,7 @@ export default function PublicarPropiedad() {
   const [loading, setLoading] = useState(false);
   const [uploadingPhotos, setUploadingPhotos] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [draggedIndex, setDraggedIndex] = useState(null);
 
   const amenitiesDisponibles = [
     'Piscina', 'Vista a la playa', 'WiFi', 'Aire acondicionado', 
@@ -34,11 +35,6 @@ export default function PublicarPropiedad() {
   const handlePhotoUpload = async (e) => {
     const files = Array.from(e.target.files);
     
-    if (files.length + fotos.length > 10) {
-      alert('Máximo 10 fotos por propiedad');
-      return;
-    }
-
     setUploadingPhotos(true);
 
     const nuevasFotos = files.map(file => ({
@@ -55,14 +51,29 @@ export default function PublicarPropiedad() {
     setFotos(prev => prev.filter(foto => foto.id !== id));
   };
 
-  const moverFoto = (index, direction) => {
+  const handleDragStart = (e, index) => {
+    setDraggedIndex(index);
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  };
+
+  const handleDrop = (e, dropIndex) => {
+    e.preventDefault();
+    
+    if (draggedIndex === null || draggedIndex === dropIndex) return;
+
     const newFotos = [...fotos];
-    const newIndex = direction === 'left' ? index - 1 : index + 1;
+    const draggedItem = newFotos[draggedIndex];
     
-    if (newIndex < 0 || newIndex >= fotos.length) return;
+    newFotos.splice(draggedIndex, 1);
+    newFotos.splice(dropIndex, 0, draggedItem);
     
-    [newFotos[index], newFotos[newIndex]] = [newFotos[newIndex], newFotos[index]];
     setFotos(newFotos);
+    setDraggedIndex(null);
   };
 
   const handleSubmit = async (e) => {
@@ -82,7 +93,7 @@ export default function PublicarPropiedad() {
     setLoading(true);
 
     try {
-      // Subir fotos a Firebase Storage
+      console.log('Iniciando subida de fotos...');
       const fotosURLs = [];
       
       for (let i = 0; i < fotos.length; i++) {
@@ -90,12 +101,15 @@ export default function PublicarPropiedad() {
         const fileName = `propiedades/${auth.currentUser.uid}/${Date.now()}_${i}.jpg`;
         const storageRef = ref(storage, fileName);
         
+        console.log(`Subiendo foto ${i + 1}/${fotos.length}...`);
         await uploadBytes(storageRef, foto.file);
         const url = await getDownloadURL(storageRef);
         fotosURLs.push(url);
+        console.log(`Foto ${i + 1} subida exitosamente`);
       }
 
-      // Guardar propiedad con URLs de fotos
+      console.log('Todas las fotos subidas, guardando en Firestore...');
+
       const propiedadData = {
         ...formData,
         fotos: fotosURLs,
@@ -109,6 +123,7 @@ export default function PublicarPropiedad() {
 
       await addDoc(collection(db, 'propiedades'), propiedadData);
       
+      console.log('Propiedad guardada exitosamente');
       setShowSuccess(true);
       
       setTimeout(() => {
@@ -117,7 +132,9 @@ export default function PublicarPropiedad() {
       
     } catch (error) {
       console.error('Error completo:', error);
-      alert(`Error al publicar: ${error.message}`);
+      console.error('Código de error:', error.code);
+      console.error('Mensaje:', error.message);
+      alert(`Error al publicar: ${error.message}\n\nAsegúrate de haber configurado las reglas de Firebase Storage correctamente.`);
     } finally {
       setLoading(false);
     }
@@ -178,28 +195,49 @@ export default function PublicarPropiedad() {
               Fotos de la propiedad *
             </label>
             <p style={{fontSize: '0.875rem', color: '#6b7280', marginBottom: '1rem'}}>
-              Agrega hasta 10 fotos. La primera será la foto de portada.
+              Agrega todas las fotos que quieras. La primera será la foto de portada. <strong>Arrastra para reordenar.</strong>
             </p>
 
-            {/* Grid de fotos */}
+            {/* Grid de fotos con drag & drop */}
             {fotos.length > 0 && (
               <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '1rem', marginBottom: '1rem'}}>
                 {fotos.map((foto, index) => (
-                  <div key={foto.id} style={{
-                    position: 'relative',
-                    aspectRatio: '1',
-                    borderRadius: '8px',
-                    overflow: 'hidden',
-                    border: '2px solid #e5e7eb',
-                    background: '#f3f4f6'
-                  }}>
+                  <div 
+                    key={foto.id}
+                    draggable
+                    onDragStart={(e) => handleDragStart(e, index)}
+                    onDragOver={handleDragOver}
+                    onDrop={(e) => handleDrop(e, index)}
+                    style={{
+                      position: 'relative',
+                      aspectRatio: '1',
+                      borderRadius: '8px',
+                      overflow: 'hidden',
+                      border: draggedIndex === index ? '3px solid #3b82f6' : '2px solid #e5e7eb',
+                      background: '#f3f4f6',
+                      cursor: 'grab',
+                      transition: 'transform 0.2s, box-shadow 0.2s',
+                      opacity: draggedIndex === index ? 0.5 : 1
+                    }}
+                    onMouseEnter={(e) => {
+                      if (draggedIndex === null) {
+                        e.currentTarget.style.transform = 'scale(1.02)';
+                        e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.15)';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = 'scale(1)';
+                      e.currentTarget.style.boxShadow = 'none';
+                    }}
+                  >
                     <img 
                       src={foto.preview} 
                       alt={`Foto ${index + 1}`}
                       style={{
                         width: '100%',
                         height: '100%',
-                        objectFit: 'cover'
+                        objectFit: 'cover',
+                        pointerEvents: 'none'
                       }}
                     />
                     
@@ -219,6 +257,28 @@ export default function PublicarPropiedad() {
                         PORTADA
                       </div>
                     )}
+
+                    {/* Número de orden */}
+                    <div style={{
+                      position: 'absolute',
+                      top: '8px',
+                      right: index === 0 ? 'auto' : '44px',
+                      left: index === 0 ? 'auto' : 'auto',
+                      right: index === 0 ? '44px' : 'auto',
+                      background: 'rgba(30, 58, 95, 0.9)',
+                      color: 'white',
+                      padding: '4px 8px',
+                      borderRadius: '50%',
+                      fontSize: '0.75rem',
+                      fontWeight: 'bold',
+                      width: '24px',
+                      height: '24px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}>
+                      {index + 1}
+                    </div>
 
                     {/* Botón eliminar */}
                     <button
@@ -249,60 +309,21 @@ export default function PublicarPropiedad() {
                       ×
                     </button>
 
-                    {/* Botones de orden */}
+                    {/* Indicador de arrastre */}
                     <div style={{
                       position: 'absolute',
                       bottom: '8px',
-                      right: '8px',
-                      display: 'flex',
-                      gap: '4px'
+                      left: '50%',
+                      transform: 'translateX(-50%)',
+                      background: 'rgba(0, 0, 0, 0.7)',
+                      color: 'white',
+                      padding: '4px 12px',
+                      borderRadius: '12px',
+                      fontSize: '0.7rem',
+                      fontWeight: 'bold',
+                      pointerEvents: 'none'
                     }}>
-                      {index > 0 && (
-                        <button
-                          type="button"
-                          onClick={() => moverFoto(index, 'left')}
-                          style={{
-                            background: 'rgba(30, 58, 95, 0.95)',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '4px',
-                            width: '28px',
-                            height: '28px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            cursor: 'pointer',
-                            fontSize: '1rem',
-                            fontWeight: 'bold',
-                            boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
-                          }}
-                        >
-                          ←
-                        </button>
-                      )}
-                      {index < fotos.length - 1 && (
-                        <button
-                          type="button"
-                          onClick={() => moverFoto(index, 'right')}
-                          style={{
-                            background: 'rgba(30, 58, 95, 0.95)',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '4px',
-                            width: '28px',
-                            height: '28px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            cursor: 'pointer',
-                            fontSize: '1rem',
-                            fontWeight: 'bold',
-                            boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
-                          }}
-                        >
-                          →
-                        </button>
-                      )}
+                      ⇅ Arrastra
                     </div>
                   </div>
                 ))}
@@ -331,14 +352,13 @@ export default function PublicarPropiedad() {
               e.target.style.background = '#f0f9ff';
               e.target.style.borderColor = '#3b82f6';
             }}>
-              {uploadingPhotos ? '📤 Subiendo fotos...' : fotos.length === 0 ? '📷 Haz clic para agregar fotos' : `📷 Agregar más fotos (${fotos.length}/10)`}
+              {uploadingPhotos ? '📤 Procesando fotos...' : fotos.length === 0 ? '📷 Haz clic para agregar fotos' : `📷 Agregar más fotos (${fotos.length} agregadas)`}
               <input
                 type="file"
                 accept="image/*"
                 multiple
                 onChange={handlePhotoUpload}
                 style={{display: 'none'}}
-                disabled={fotos.length >= 10}
               />
             </label>
           </div>
