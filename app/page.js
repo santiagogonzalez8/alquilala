@@ -29,7 +29,7 @@ export default function Home() {
     },
     {
       name: 'La Paloma',
-      image: 'https://radiocarve.uy/wp-content/uploads/2024/08/la-paloma-2.jpg'
+      image: 'https://content.r9cdn.net/rimg/dimg/9f/96/f2478ec8-city-67086-172920a6c3d.jpg?crop=true&width=1366&height=768&xhint=3930&yhint=1459'
     },
     {
       name: 'Colonia del Sacramento',
