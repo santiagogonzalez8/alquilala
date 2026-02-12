@@ -14,26 +14,32 @@ export default function Home() {
   const [esAdmin, setEsAdmin] = useState(false)
   const [currentSlide, setCurrentSlide] = useState(0)
 
+  // Fotos características de cada lugar turístico de Uruguay
   const slides = [
     {
       name: 'Punta del Este',
-      image: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=1600&h=800&fit=crop&q=80'
+      image: 'https://images.unsplash.com/photo-1580837119756-563d608dd119?w=1920&h=1080&fit=crop&q=80',
+      description: 'La Mano en la playa Brava'
     },
     {
       name: 'Cabo Polonio',
-      image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1600&h=800&fit=crop&q=80'
+      image: 'https://images.unsplash.com/photo-1518098268026-4e89f1a2cd8e?w=1920&h=1080&fit=crop&q=80',
+      description: 'Faro histórico y lobos marinos'
     },
     {
       name: 'Punta del Diablo',
-      image: 'https://images.unsplash.com/photo-1519046904884-53103b34b206?w=1600&h=800&fit=crop&q=80'
+      image: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=1920&h=1080&fit=crop&q=80',
+      description: 'Pueblo de pescadores con playas vírgenes'
     },
     {
       name: 'La Paloma',
-      image: 'https://images.unsplash.com/photo-1505142468610-359e7d316be0?w=1600&h=800&fit=crop&q=80'
+      image: 'https://images.unsplash.com/photo-1505142468610-359e7d316be0?w=1920&h=1080&fit=crop&q=80',
+      description: 'Bahía y playas paradisíacas'
     },
     {
       name: 'Colonia del Sacramento',
-      image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1600&h=800&fit=crop&q=80'
+      image: 'https://images.unsplash.com/photo-1555881770-09f8e1fc36fc?w=1920&h=1080&fit=crop&q=80',
+      description: 'Ciudad histórica Patrimonio de la Humanidad'
     }
   ]
 
@@ -101,46 +107,44 @@ export default function Home() {
       )}
 
       <div className={styles.heroSection} style={{position: 'relative'}}>
-        {/* Carrusel de imágenes */}
+        {/* Carrusel de imágenes de fondo */}
         {slides.map((slide, index) => (
           <div
             key={index}
-            className={styles.heroImage}
             style={{
               position: 'absolute',
               top: 0,
               left: 0,
               width: '100%',
               height: '100%',
-              backgroundImage: `linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url(${slide.image})`,
+              backgroundImage: `linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)), url(${slide.image})`,
               backgroundSize: 'cover',
               backgroundPosition: 'center',
               opacity: currentSlide === index ? 1 : 0,
               transition: 'opacity 0.8s ease',
               zIndex: currentSlide === index ? 1 : 0
             }}
-          >
-            {/* Nombre del lugar */}
-            {currentSlide === index && (
-              <div style={{
-                position: 'absolute',
-                top: '2.5rem',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                background: 'rgba(30, 58, 95, 0.95)',
-                color: 'white',
-                padding: '0.875rem 2.5rem',
-                borderRadius: '12px',
-                fontSize: '1.75rem',
-                fontWeight: 'bold',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
-                zIndex: 10
-              }}>
-                {slide.name}
-              </div>
-            )}
-          </div>
+          />
         ))}
+
+        {/* Nombre del lugar - SIEMPRE VISIBLE */}
+        <div style={{
+          position: 'absolute',
+          top: '2.5rem',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          background: 'rgba(30, 58, 95, 0.95)',
+          color: 'white',
+          padding: '0.875rem 2.5rem',
+          borderRadius: '12px',
+          fontSize: '1.75rem',
+          fontWeight: 'bold',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+          zIndex: 20,
+          transition: 'none'
+        }}>
+          {slides[currentSlide].name}
+        </div>
 
         {/* Botón anterior */}
         <button
@@ -162,7 +166,7 @@ export default function Home() {
             fontSize: '1.75rem',
             color: '#1e3a5f',
             boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
-            zIndex: 10,
+            zIndex: 20,
             transition: 'all 0.2s',
             fontWeight: 'bold'
           }}
@@ -200,7 +204,7 @@ export default function Home() {
             fontSize: '1.75rem',
             color: '#1e3a5f',
             boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
-            zIndex: 10,
+            zIndex: 20,
             transition: 'all 0.2s',
             fontWeight: 'bold'
           }}
@@ -226,7 +230,7 @@ export default function Home() {
           transform: 'translateX(-50%)',
           display: 'flex',
           gap: '0.75rem',
-          zIndex: 10
+          zIndex: 20
         }}>
           {slides.map((_, index) => (
             <button
@@ -246,7 +250,8 @@ export default function Home() {
           ))}
         </div>
 
-        <div className={styles.heroContent}>
+        {/* BARRA DE BÚSQUEDA Y TEXTO - SIEMPRE VISIBLE, z-index alto */}
+        <div className={styles.heroContent} style={{position: 'relative', zIndex: 15}}>
           <div className={styles.searchContainer}>
             <p className={styles.subtitle}>Gestión profesional de alquileres temporales</p>
             <div className={styles.searchBar}>
