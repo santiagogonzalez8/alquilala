@@ -14,32 +14,27 @@ export default function Home() {
   const [esAdmin, setEsAdmin] = useState(false)
   const [currentSlide, setCurrentSlide] = useState(0)
 
-  // Fotos características de cada lugar turístico de Uruguay
+  // Fotos características REALES de cada lugar turístico de Uruguay
   const slides = [
     {
       name: 'Punta del Este',
-      image: 'https://images.unsplash.com/photo-1580837119756-563d608dd119?w=1920&h=1080&fit=crop&q=80',
-      description: 'La Mano en la playa Brava'
+      image: 'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/0f/a3/87/d5/getlstd-property-photo.jpg?w=1200&h=-1&s=1'
     },
     {
       name: 'Cabo Polonio',
-      image: 'https://images.unsplash.com/photo-1518098268026-4e89f1a2cd8e?w=1920&h=1080&fit=crop&q=80',
-      description: 'Faro histórico y lobos marinos'
+      image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Cabo_Polonio_Lighthouse.jpg/1200px-Cabo_Polonio_Lighthouse.jpg'
     },
     {
       name: 'Punta del Diablo',
-      image: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=1920&h=1080&fit=crop&q=80',
-      description: 'Pueblo de pescadores con playas vírgenes'
+      image: 'https://www.gub.uy/ministerio-turismo/sites/ministerio-turismo/files/2019-07/punta-del-diablo.jpg'
     },
     {
       name: 'La Paloma',
-      image: 'https://images.unsplash.com/photo-1505142468610-359e7d316be0?w=1920&h=1080&fit=crop&q=80',
-      description: 'Bahía y playas paradisíacas'
+      image: 'https://turismo.gub.uy/images/hero/la-paloma-rocha.jpg'
     },
     {
       name: 'Colonia del Sacramento',
-      image: 'https://images.unsplash.com/photo-1555881770-09f8e1fc36fc?w=1920&h=1080&fit=crop&q=80',
-      description: 'Ciudad histórica Patrimonio de la Humanidad'
+      image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Colonia_del_Sacramento_Street.jpg/1200px-Colonia_del_Sacramento_Street.jpg'
     }
   ]
 
@@ -127,7 +122,7 @@ export default function Home() {
           />
         ))}
 
-        {/* Nombre del lugar - SIEMPRE VISIBLE */}
+        {/* Nombre del lugar - ARRIBA */}
         <div style={{
           position: 'absolute',
           top: '2.5rem',
@@ -140,8 +135,7 @@ export default function Home() {
           fontSize: '1.75rem',
           fontWeight: 'bold',
           boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
-          zIndex: 20,
-          transition: 'none'
+          zIndex: 20
         }}>
           {slides[currentSlide].name}
         </div>
@@ -222,7 +216,7 @@ export default function Home() {
           →
         </button>
 
-        {/* Indicadores de posición */}
+        {/* Indicadores de posición - ABAJO */}
         <div style={{
           position: 'absolute',
           bottom: '2rem',
@@ -250,20 +244,35 @@ export default function Home() {
           ))}
         </div>
 
-        {/* BARRA DE BÚSQUEDA Y TEXTO - SIEMPRE VISIBLE, z-index alto */}
-        <div className={styles.heroContent} style={{position: 'relative', zIndex: 15}}>
-          <div className={styles.searchContainer}>
-            <p className={styles.subtitle}>Gestión profesional de alquileres temporales</p>
-            <div className={styles.searchBar}>
-              <input 
-                type="text" 
-                placeholder="Busca propiedades asociadas en la plataforma"
-                className={styles.searchInput}
-              />
-              <Link href="/mis-propiedades" className={styles.searchBtn}>
-                Buscar
-              </Link>
-            </div>
+        {/* BARRA DE BÚSQUEDA Y TEXTO - ABAJO (justo arriba de los indicadores) */}
+        <div style={{
+          position: 'absolute',
+          bottom: '5rem',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          width: '90%',
+          maxWidth: '700px',
+          zIndex: 15,
+          textAlign: 'center'
+        }}>
+          <p style={{
+            color: 'white',
+            fontSize: '1.25rem',
+            fontWeight: '600',
+            marginBottom: '1.5rem',
+            textShadow: '0 2px 4px rgba(0,0,0,0.5)'
+          }}>
+            Gestión profesional de alquileres temporales
+          </p>
+          <div className={styles.searchBar}>
+            <input 
+              type="text" 
+              placeholder="Busca propiedades asociadas en la plataforma"
+              className={styles.searchInput}
+            />
+            <Link href="/mis-propiedades" className={styles.searchBtn}>
+              Buscar
+            </Link>
           </div>
         </div>
       </div>
