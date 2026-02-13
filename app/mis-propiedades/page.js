@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { auth, db } from '@/lib/firebase';
 import { collection, query, where, getDocs, deleteDoc, doc } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import styles from './mispropiedades.module.css';
 
@@ -13,28 +14,28 @@ function MisPropiedadesContenido() {
   const [filtradas, setFiltradas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [busqueda, setBusqueda] = useState('');
+  const [filtroEstado, setFiltroEstado] = useState('todos');
+  const [expandido, setExpandido] = useState(null);
+
+  useEffect(() => { cargarMisPropiedades(); }, []);
 
   useEffect(() => {
-    cargarMisPropiedades();
-  }, []);
-
-  useEffect(() => {
-    if (busqueda.trim() === '') {
-      setFiltradas(propiedades);
-    } else {
-      setFiltradas(propiedades.filter(p =>
+    let resultado = propiedades;
+    if (busqueda.trim()) {
+      resultado = resultado.filter(p =>
         p.titulo?.toLowerCase().includes(busqueda.toLowerCase()) ||
         p.ubicacion?.toLowerCase().includes(busqueda.toLowerCase())
-      ));
+      );
     }
-  }, [busqueda, propiedades]);
+    if (filtroEstado !== 'todos') {
+      resultado = resultado.filter(p => p.estado === filtroEstado);
+    }
+    setFiltradas(resultado);
+  }, [busqueda, filtroEstado, propiedades]);
 
   const cargarMisPropiedades = async () => {
     try {
-      const q = query(
-        collection(db, 'propiedades'),
-        where('userId', '==', auth.currentUser.uid)
-      );
+      const q = query(collection(db, 'propiedades'), where('userId', '==', auth.currentUser.uid));
       const snapshot = await getDocs(q);
       const data = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
       setPropiedades(data);
@@ -47,7 +48,7 @@ function MisPropiedadesContenido() {
   };
 
   const eliminarPropiedad = async (id) => {
-    if (!confirm('¿Estás seguro de eliminar esta propiedad?')) return;
+    if (!confirm('¿Estás seguro de eliminar esta propiedad? Esta acción no se puede deshacer.')) return;
     try {
       await deleteDoc(doc(db, 'propiedades', id));
       cargarMisPropiedades();
@@ -56,101 +57,191 @@ function MisPropiedadesContenido() {
     }
   };
 
-  const getEstadoBadge = (estado) => {
+  const getEstadoInfo = (estado) => {
     switch (estado) {
-      case 'disponible': return styles.badgeGreen;
-      case 'pendiente': return styles.badgeYellow;
-      case 'pausada': return styles.badgeBlue;
-      default: return styles.badgeRed;
+      case 'disponible': return { label: '✅ Activa', class: styles.badgeGreen, desc: 'Tu propiedad está publicada y visible' };
+      case 'pendiente': return { label: '⏳ En revisión', class: styles.badgeYellow, desc: 'Nuestro equipo está revisando tu publicación' };
+      case 'pausada': return { label: '⏸️ Pausada', class: styles.badgeBlue, desc: 'Tu propiedad está temporalmente fuera de línea' };
+      case 'rechazada': return { label: '❌ Rechazada', class: styles.badgeRed, desc: 'Revisá los datos y volvé a publicar' };
+      default: return { label: estado || 'Sin estado', class: styles.badgeGray, desc: '' };
     }
   };
 
   return (
     <div className={styles.page}>
-      {/* Header */}
       <div className={styles.header}>
-        <div className={styles.headerContent}>
-          <span className="section-label">Mi cuenta</span>
-          <h1 className={styles.headerTitle}>Mis Propiedades</h1>
-          <p className={styles.headerSubtitle}>Propiedades que publicaste en la plataforma</p>
+        <div className={styles.headerInner}>
+          <div>
+            <span className="section-label">Mi cuenta</span>
+            <h1 className={styles.headerTitle}>Mis Propiedades</h1>
+            <p className={styles.headerSubtitle}>
+              {propiedades.length} {propiedades.length === 1 ? 'propiedad publicada' : 'propiedades publicadas'}
+            </p>
+          </div>
+          <Link href="/publicar" className={styles.headerBtn}>
+            ➕ Publicar nueva
+          </Link>
         </div>
       </div>
 
       <div className={styles.content}>
-        {/* Barra de búsqueda */}
-        <div className={styles.searchBar}>
-          <input
-            type="text"
-            placeholder="🔍 Buscar por título o ubicación..."
-            value={busqueda}
-            onChange={(e) => setBusqueda(e.target.value)}
-            className={styles.searchInput}
-          />
-          <button onClick={() => router.push('/publicar')} className={styles.btnNew}>
-            ➕ Nueva propiedad
-          </button>
-        </div>
+        {/* Filtros */}
+        {propiedades.length > 0 && (
+          <div className={styles.filterBar}>
+            <input
+              type="text"
+              placeholder="🔍 Buscar por título o ubicación..."
+              value={busqueda}
+              onChange={(e) => setBusqueda(e.target.value)}
+              className={styles.filterInput}
+            />
+            <select
+              value={filtroEstado}
+              onChange={(e) => setFiltroEstado(e.target.value)}
+              className={styles.filterSelect}
+            >
+              <option value="todos">Todos los estados</option>
+              <option value="disponible">✅ Activas</option>
+              <option value="pendiente">⏳ En revisión</option>
+              <option value="pausada">⏸️ Pausadas</option>
+              <option value="rechazada">❌ Rechazadas</option>
+            </select>
+          </div>
+        )}
 
+        {/* Loading */}
         {loading ? (
           <div className={styles.emptyState}>
             <div className="loading-spinner" style={{ margin: '0 auto 1rem' }}></div>
             <p>Cargando tus propiedades...</p>
           </div>
         ) : propiedades.length === 0 ? (
+          /* Empty */
           <div className={styles.emptyState}>
             <div className={styles.emptyIcon}>🏖️</div>
             <h3>No tenés propiedades publicadas</h3>
-            <p>¡Empezá a generar ingresos con tu casa!</p>
-            <button onClick={() => router.push('/publicar')} className={styles.btnPrimary}>
-              Publicar mi primera propiedad
-            </button>
+            <p>Publicá tu primera propiedad y nosotros nos encargamos de gestionarla integralmente.</p>
+            <Link href="/publicar" className={styles.ctaBtn}>
+              Publicar mi propiedad
+            </Link>
           </div>
         ) : filtradas.length === 0 ? (
           <div className={styles.emptyState}>
-            <p>No se encontraron resultados para "{busqueda}"</p>
-            <button onClick={() => setBusqueda('')} className={styles.btnLink}>
-              Limpiar búsqueda
+            <p>No se encontraron propiedades con esos filtros.</p>
+            <button onClick={() => { setBusqueda(''); setFiltroEstado('todos'); }} className={styles.btnLink}>
+              Limpiar filtros
             </button>
           </div>
         ) : (
+          /* Grid */
           <div className={styles.grid}>
-            {filtradas.map(prop => (
-              <div key={prop.id} className={styles.card}>
-                <div
-                  className={styles.cardImage}
-                  style={{
-                    backgroundImage: prop.imagenes?.[0] || prop.fotoPrincipal
-                      ? `url(${prop.imagenes?.[0] || prop.fotoPrincipal})`
-                      : 'linear-gradient(135deg, #1e3a5f, #2d4a6f)'
-                  }}
-                >
-                  <span className={`${styles.badge} ${getEstadoBadge(prop.estado)}`}>
-                    {prop.estado || 'disponible'}
-                  </span>
-                  {prop.tipoPropiedad && (
-                    <span className={styles.typeBadge}>{prop.tipoPropiedad}</span>
+            {filtradas.map(prop => {
+              const estadoInfo = getEstadoInfo(prop.estado);
+              return (
+                <div key={prop.id} className={styles.card}>
+                  {/* Imagen */}
+                  <div
+                    className={styles.cardImage}
+                    style={{
+                      backgroundImage: (prop.imagenes?.[0] || prop.fotoPrincipal)
+                        ? `url(${prop.imagenes?.[0] || prop.fotoPrincipal})`
+                        : 'linear-gradient(135deg, var(--color-primary), var(--color-primary-light))'
+                    }}
+                  >
+                    <span className={`${styles.badge} ${estadoInfo.class}`}>
+                      {estadoInfo.label}
+                    </span>
+                    {prop.tipoPropiedad && (
+                      <span className={styles.typeBadge}>{prop.tipoPropiedad}</span>
+                    )}
+                    {/* Fotos count */}
+                    {prop.imagenes?.length > 1 && (
+                      <span className={styles.photosCount}>📷 {prop.imagenes.length}</span>
+                    )}
+                  </div>
+
+                  {/* Body */}
+                  <div className={styles.cardBody}>
+                    <h3 className={styles.cardTitle}>{prop.titulo}</h3>
+                    <p className={styles.cardLocation}>📍 {prop.ubicacion}</p>
+
+                    <div className={styles.cardDetails}>
+                      <span>👥 {prop.huespedes}</span>
+                      <span>🛏️ {prop.dormitorios}</span>
+                      <span>🚿 {prop.banos}</span>
+                    </div>
+
+                    {/* Amenities preview */}
+                    {prop.amenities?.length > 0 && (
+                      <div className={styles.amenitiesPreview}>
+                        {prop.amenities.slice(0, 3).map((a, i) => (
+                          <span key={i} className={styles.amenityTag}>{a}</span>
+                        ))}
+                        {prop.amenities.length > 3 && (
+                          <span className={styles.amenityTag}>+{prop.amenities.length - 3}</span>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Estado descripción */}
+                    <p className={styles.estadoDesc}>{estadoInfo.desc}</p>
+
+                    {/* Footer */}
+                    <div className={styles.cardFooter}>
+                      <div className={styles.cardPrice}>
+                        <span className={styles.priceValue}>${prop.precioPorNoche}</span>
+                        <span className={styles.priceLabel}>/noche</span>
+                      </div>
+                      <div className={styles.cardActions}>
+                        <button
+                          onClick={() => setExpandido(expandido === prop.id ? null : prop.id)}
+                          className={styles.btnOutline}
+                        >
+                          {expandido === prop.id ? 'Cerrar' : 'Detalles'}
+                        </button>
+                        <button onClick={() => eliminarPropiedad(prop.id)} className={styles.btnDeleteSmall}>
+                          🗑️
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Expandido */}
+                  {expandido === prop.id && (
+                    <div className={styles.cardExpanded}>
+                      {prop.descripcion && (
+                        <div className={styles.expandedSection}>
+                          <strong>Descripción:</strong>
+                          <p>{prop.descripcion}</p>
+                        </div>
+                      )}
+                      {prop.imagenes?.length > 1 && (
+                        <div className={styles.expandedSection}>
+                          <strong>Fotos ({prop.imagenes.length}):</strong>
+                          <div className={styles.expandedPhotos}>
+                            {prop.imagenes.map((url, i) => (
+                              <a key={i} href={url} target="_blank" rel="noopener noreferrer">
+                                <img src={url} alt={`Foto ${i + 1}`} className={styles.expandedPhoto} />
+                              </a>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      <div className={styles.expandedSection}>
+                        <strong>Fecha de publicación:</strong>
+                        <p>{prop.fechaPublicacion ? new Date(prop.fechaPublicacion).toLocaleDateString('es-UY', { day: 'numeric', month: 'long', year: 'numeric' }) : 'N/A'}</p>
+                      </div>
+                      {prop.fechasOcupadas?.length > 0 && (
+                        <div className={styles.expandedSection}>
+                          <strong>Fechas ocupadas:</strong>
+                          <p>{prop.fechasOcupadas.length} días marcados como ocupados</p>
+                        </div>
+                      )}
+                    </div>
                   )}
                 </div>
-                <div className={styles.cardBody}>
-                  <h3 className={styles.cardTitle}>{prop.titulo}</h3>
-                  <p className={styles.cardLocation}>📍 {prop.ubicacion}</p>
-                  <div className={styles.cardDetails}>
-                    <span>👥 {prop.huespedes}</span>
-                    <span>🛏️ {prop.dormitorios}</span>
-                    <span>🚿 {prop.banos}</span>
-                  </div>
-                  <div className={styles.cardFooter}>
-                    <div className={styles.cardPrice}>
-                      <span className={styles.priceValue}>${prop.precioPorNoche}</span>
-                      <span className={styles.priceLabel}>/noche</span>
-                    </div>
-                    <button onClick={() => eliminarPropiedad(prop.id)} className={styles.btnDelete}>
-                      🗑️
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

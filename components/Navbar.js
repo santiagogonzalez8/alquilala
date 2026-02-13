@@ -15,29 +15,19 @@ export default function Navbar({ user }) {
   const [userData, setUserData] = useState(null)
   const [scrolled, setScrolled] = useState(false)
 
-  // Detectar scroll para cambiar estilo del navbar
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20)
-    }
+    const handleScroll = () => setScrolled(window.scrollY > 20)
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  // Cargar datos del usuario
   useEffect(() => {
-    if (user) {
-      loadUserData(user.uid)
-    } else {
-      setUserData(null)
-    }
+    if (user) { loadUserData(user.uid) }
+    else { setUserData(null) }
   }, [user])
 
-  // Cerrar menú con Escape
   useEffect(() => {
-    const handleEsc = (e) => {
-      if (e.key === 'Escape') setMenuOpen(false)
-    }
+    const handleEsc = (e) => { if (e.key === 'Escape') setMenuOpen(false) }
     window.addEventListener('keydown', handleEsc)
     return () => window.removeEventListener('keydown', handleEsc)
   }, [])
@@ -45,27 +35,14 @@ export default function Navbar({ user }) {
   const loadUserData = async (uid) => {
     try {
       const userDoc = await getDoc(doc(db, 'users', uid))
-      if (userDoc.exists()) {
-        setUserData(userDoc.data())
-      } else {
-        setUserData({
-          displayName: auth.currentUser?.displayName,
-          photoURL: auth.currentUser?.photoURL
-        })
-      }
-    } catch (error) {
-      console.error('Error:', error)
-    }
+      if (userDoc.exists()) { setUserData(userDoc.data()) }
+      else { setUserData({ displayName: auth.currentUser?.displayName, photoURL: auth.currentUser?.photoURL }) }
+    } catch (error) { console.error('Error:', error) }
   }
 
   const handleLogout = async () => {
-    try {
-      await signOut(auth)
-      setMenuOpen(false)
-      router.push('/')
-    } catch (error) {
-      console.error('Error:', error)
-    }
+    try { await signOut(auth); setMenuOpen(false); router.push('/') }
+    catch (error) { console.error('Error:', error) }
   }
 
   const getUserInitials = () => {
@@ -80,7 +57,6 @@ export default function Navbar({ user }) {
     <>
       <nav className={`${styles.navbar} ${scrolled ? styles.scrolled : ''}`}>
         <div className={styles.navInner}>
-          {/* Logo */}
           <Link href="/" className={styles.logo}>
             <svg width="36" height="36" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
               <rect x="10" y="20" width="20" height="16" fill="#1e3a5f"/>
@@ -92,7 +68,6 @@ export default function Navbar({ user }) {
             <span>alquilala</span>
           </Link>
 
-          {/* Links centrales (desktop) */}
           <div className={styles.navLinks}>
             <Link href="/#como-funciona" className={styles.navLink}>Cómo funciona</Link>
             <Link href="/#servicios" className={styles.navLink}>Servicios</Link>
@@ -100,56 +75,35 @@ export default function Navbar({ user }) {
             <Link href="/soporte" className={styles.navLink}>Contacto</Link>
           </div>
 
-          {/* Lado derecho */}
           <div className={styles.navRight}>
             {user ? (
-              /* ---- USUARIO LOGUEADO ---- */
               <>
                 {isAdmin(user.email) && (
-                  <Link href="/admin" className={styles.adminBadge}>
-                    Panel Admin
-                  </Link>
+                  <Link href="/admin" className={styles.adminBadge}>Panel Admin</Link>
                 )}
-                <button
-                  className={styles.userButton}
-                  onClick={() => setMenuOpen(!menuOpen)}
-                  aria-label="Menú de usuario"
-                >
-                  <div className={styles.hamburgerLines}>
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                  </div>
+                <button className={styles.userButton} onClick={() => setMenuOpen(!menuOpen)} aria-label="Menú de usuario">
+                  <div className={styles.hamburgerLines}><span></span><span></span><span></span></div>
                   {getPhotoURL() ? (
                     <img src={getPhotoURL()} alt="User" className={styles.userThumb} />
                   ) : (
-                    <div className={styles.userInitial}>
-                      {getUserInitials()}
-                    </div>
+                    <div className={styles.userInitial}>{getUserInitials()}</div>
                   )}
                 </button>
               </>
             ) : (
-              /* ---- VISITANTE (NO LOGUEADO) ---- */
               <div className={styles.authButtons}>
-                <Link href="/login" className={styles.btnLogin}>
-                  Iniciar sesión
-                </Link>
-                <Link href="/login" className={styles.btnRegister}>
-                  Publicá tu casa
-                </Link>
+                <Link href="/login" className={styles.btnLogin}>Iniciar sesión</Link>
+                <Link href="/login" className={styles.btnRegister}>Publicá tu casa</Link>
               </div>
             )}
           </div>
         </div>
       </nav>
 
-      {/* ---- MENÚ LATERAL (solo logueados) ---- */}
       {menuOpen && (
         <>
           <div className={styles.overlay} onClick={() => setMenuOpen(false)} />
           <div className={styles.menu}>
-            {/* Header del menú */}
             <div className={styles.menuHeader}>
               <button className={styles.menuClose} onClick={() => setMenuOpen(false)}>✕</button>
               <div className={styles.menuUserInfo}>
@@ -159,28 +113,28 @@ export default function Navbar({ user }) {
                   <div className={styles.menuPhoto}>{getUserInitials()}</div>
                 )}
                 <div>
-                  <p className={styles.menuName}>
-                    {userData?.displayName || user?.displayName || 'Usuario'}
-                  </p>
+                  <p className={styles.menuName}>{userData?.displayName || user?.displayName || 'Usuario'}</p>
                   <p className={styles.menuEmail}>{user?.email}</p>
                 </div>
               </div>
             </div>
 
-            {/* Navegación del menú */}
             <nav className={styles.menuNav}>
+              <Link href="/mi-panel" className={styles.menuItem} onClick={() => setMenuOpen(false)}>
+                <span>📊</span> Mi Panel
+              </Link>
               <Link href="/perfil" className={styles.menuItem} onClick={() => setMenuOpen(false)}>
                 <span>👤</span> Mi Perfil
               </Link>
+
+              <div className={styles.divider} />
+
               <Link href="/mis-propiedades" className={styles.menuItem} onClick={() => setMenuOpen(false)}>
                 <span>🏠</span> Mis Propiedades
               </Link>
               <Link href="/mis-reservas" className={styles.menuItem} onClick={() => setMenuOpen(false)}>
                 <span>📅</span> Mis Reservas
               </Link>
-
-              <div className={styles.divider} />
-
               <Link href="/publicar" className={styles.menuItem} onClick={() => setMenuOpen(false)}>
                 <span>➕</span> Publicar Propiedad
               </Link>
