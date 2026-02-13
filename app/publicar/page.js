@@ -1,12 +1,44 @@
 'use client';
 
 import { useState } from 'react';
-import { auth, db, storage } from '@/lib/firebase';
-import { collection, addDoc, enableNetwork, disableNetwork } from 'firebase/firestore';
+import { auth, storage } from '@/lib/firebase';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { useRouter } from 'next/navigation';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import styles from './publicar.module.css';
+
+// Escribir directo a Firestore via REST API (sin SDK)
+async function guardarEnFirestore(data) {
+  const projectId = 'alquilala-77';
+  const url = `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents/propiedades`;
+
+  // Convertir datos a formato Firestore REST
+  const fields = {};
+  for (const [key, value] of Object.entries(data)) {
+    if (Array.isArray(value)) {
+      fields[key] = {
+        arrayValue: {
+          values: value.map(v => ({ stringValue: String(v) }))
+        }
+      };
+    } else {
+      fields[key] = { stringValue: String(value) };
+    }
+  }
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ fields })
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error?.message || `HTTP ${response.status}`);
+  }
+
+  return await response.json();
+}
 
 function PublicarContenido() {
   const router = useRouter();
@@ -46,16 +78,6 @@ function PublicarContenido() {
     setFotos(n); setDraggedIndex(null);
   };
 
-  // Función con timeout
-  const withTimeout = (promise, ms) => {
-    return Promise.race([
-      promise,
-      new Promise((_, reject) =>
-        setTimeout(() => reject(new Error(`Timeout: la operación tardó más de ${ms / 1000} segundos`)), ms)
-      )
-    ]);
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMsg('');
@@ -65,20 +87,13 @@ function PublicarContenido() {
 
     setLoading(true);
     setProgreso(5);
-    setEtapa('Conectando...');
+    setEtapa('Preparando...');
 
     try {
-      // Forzar reconexión de Firestore
-      try {
-        await enableNetwork(db);
-      } catch (e) {
-        console.log('enableNetwork:', e.message);
-      }
-
       let fotosURLs = [];
       const totalSteps = fotos.length + 1;
 
-      // Subir fotos
+      // Subir fotos a Storage (esto SÍ funciona según vimos)
       if (fotos.length > 0) {
         setEtapa('Subiendo fotos...');
         for (let i = 0; i < fotos.length; i++) {
@@ -87,8 +102,8 @@ function PublicarContenido() {
             const foto = fotos[i];
             const fileName = `propiedades/${user.uid}/${Date.now()}_${i}.jpg`;
             const storageRef = ref(storage, fileName);
-            await withTimeout(uploadBytes(storageRef, foto.file), 30000);
-            const url = await withTimeout(getDownloadURL(storageRef), 10000);
+            await uploadBytes(storageRef, foto.file);
+            const url = await getDownloadURL(storageRef);
             fotosURLs.push(url);
           } catch (err) {
             console.error(`Foto ${i + 1} falló:`, err.message);
@@ -99,10 +114,11 @@ function PublicarContenido() {
         setProgreso(50);
       }
 
-      // Guardar en Firestore
-      setEtapa('Guardando propiedad...');
+      // Guardar via REST API (NO usa el SDK de Firestore)
+      setEtapa('Publicando...');
+      setProgreso(90);
 
-      const data = {
+      await guardarEnFirestore({
         titulo: formData.titulo,
         ubicacion: formData.ubicacion,
         precioPorNoche: formData.precioPorNoche,
@@ -116,18 +132,12 @@ function PublicarContenido() {
         imagenes: fotosURLs,
         fotoPrincipal: fotosURLs[0] || '',
         userId: user.uid,
-        userEmail: user.email,
+        userEmail: user.email || '',
         fechaPublicacion: new Date().toISOString(),
         estado: 'pendiente',
         temporada: 'verano'
-      };
+      });
 
-      const docRef = await withTimeout(
-        addDoc(collection(db, 'propiedades'), data),
-        15000
-      );
-
-      console.log('✅ Propiedad guardada con ID:', docRef.id);
       setProgreso(100);
       setEtapa('¡Publicada!');
       setShowSuccess(true);
@@ -136,17 +146,7 @@ function PublicarContenido() {
 
     } catch (error) {
       console.error('ERROR:', error);
-
-      let mensaje = error.message;
-      if (error.message?.includes('offline')) {
-        mensaje = 'Firebase no puede conectarse. Probá recargar la página (F5) y volvé a intentar.';
-      } else if (error.message?.includes('Timeout')) {
-        mensaje = 'La operación tardó demasiado. Probá con menos fotos o sin fotos, y volvé a intentar.';
-      } else if (error.message?.includes('permission')) {
-        mensaje = 'Sin permisos. Verificá que estés logueado y las reglas de Firebase.';
-      }
-
-      setErrorMsg(mensaje);
+      setErrorMsg(`Error: ${error.message}`);
       setProgreso(0);
       setEtapa('');
     } finally {
@@ -208,7 +208,8 @@ function PublicarContenido() {
           <div className={styles.section}>
             <h2 className={styles.sectionTitle}>🏠 Datos de la propiedad</h2>
             <div className={styles.formGroup}><label>Título *</label>
-              <input type="text" name="titulo" value={formData.titulo} onChange={handleChange} required placeholder="Ej: Casa en Punta Negra para 6 personas con piscina y vista al mar" /></div>
+              <input type="text" name="titulo" value={formData.titulo} onChange={handleChange} required
+                placeholder="Ej: Casa en Punta Negra para 6 personas con piscina y vista al mar" /></div>
             <div className={styles.formGroup}><label>Ubicación *</label>
               <input type="text" name="ubicacion" value={formData.ubicacion} onChange={handleChange} required placeholder="Ej: Punta Negra, Maldonado" /></div>
             <div className={styles.formGroup}><label>Tipo *</label>
@@ -254,12 +255,6 @@ function PublicarContenido() {
               padding: '1rem', marginBottom: '1rem', color: '#c62828', fontWeight: 600, fontSize: '0.9rem'
             }}>
               ⚠️ {errorMsg}
-              <br />
-              <button type="button" onClick={() => { setErrorMsg(''); window.location.reload(); }}
-                style={{ marginTop: '0.75rem', background: '#c62828', color: 'white', border: 'none',
-                  padding: '0.5rem 1.25rem', borderRadius: '6px', fontWeight: 700, cursor: 'pointer', fontSize: '0.85rem' }}>
-                🔄 Recargar página e intentar de nuevo
-              </button>
             </div>
           )}
 
