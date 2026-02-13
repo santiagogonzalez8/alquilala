@@ -3,16 +3,16 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { auth } from '@/lib/firebase'
-import { onAuthStateChanged } from 'firebase/auth'
+import { auth, db } from '@/lib/firebase'
+import { collection, getDocs, query, where, limit } from 'firebase/firestore'
+import { isAdmin } from '@/lib/adminConfig'
 import styles from './page.module.css'
 
 export default function Home() {
   const router = useRouter()
-  const [loading, setLoading] = useState(true)
   const [user, setUser] = useState(null)
-  const [esAdmin, setEsAdmin] = useState(false)
   const [currentSlide, setCurrentSlide] = useState(0)
+  const [propiedades, setPropiedades] = useState([])
 
   const slides = [
     {
@@ -47,249 +47,299 @@ export default function Home() {
     }
   ]
 
+  // Auto-avance del carrusel
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      if (!currentUser) {
-        router.push('/login')
-      } else {
-        setUser(currentUser)
-        setEsAdmin(currentUser.email === 'gosanti2000@gmail.com')
-        setLoading(false)
-      }
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % slides.length)
+    }, 5000)
+    return () => clearInterval(timer)
+  }, [slides.length])
+
+  // Escuchar auth (sin redirigir)
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((currentUser) => {
+      setUser(currentUser)
     })
-
     return () => unsubscribe()
-  }, [router])
+  }, [])
 
-  const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % slides.length)
-  }
+  // Cargar propiedades disponibles
+  useEffect(() => {
+    const cargarPropiedades = async () => {
+      try {
+        const q = query(
+          collection(db, 'propiedades'),
+          where('estado', '==', 'disponible'),
+          limit(6)
+        )
+        const snapshot = await getDocs(q)
+        const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+        setPropiedades(data)
+      } catch (error) {
+        console.error('Error cargando propiedades:', error)
+      }
+    }
+    cargarPropiedades()
+  }, [])
 
-  const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length)
-  }
+  const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % slides.length)
+  const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length)
 
-  if (loading) {
-    return <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', color: '#1e3a5f' }}>Cargando...</div>
-  }
+  const pasos = [
+    {
+      icon: '📋',
+      titulo: 'Registrá tu propiedad',
+      desc: 'Completá los datos de tu casa: fotos, ubicación, capacidad y amenities.'
+    },
+    {
+      icon: '🚀',
+      titulo: 'Nosotros la publicamos',
+      desc: 'La publicamos en Airbnb, Booking y MercadoLibre con fotos y textos profesionales.'
+    },
+    {
+      icon: '🛎️',
+      titulo: 'Gestionamos todo',
+      desc: 'Reservas, calendario, check-in/out, limpieza, mantenimiento y atención al huésped.'
+    },
+    {
+      icon: '💰',
+      titulo: 'Vos cobrás',
+      desc: 'Recibís tus ingresos sin preocuparte por nada. Reportes claros y transparentes.'
+    }
+  ]
+
+  const servicios = [
+    {
+      icon: '📢',
+      titulo: 'Publicación multi-plataforma',
+      desc: 'Tu propiedad en Airbnb, Booking y MercadoLibre simultáneamente, con fotos profesionales y textos optimizados.'
+    },
+    {
+      icon: '📅',
+      titulo: 'Gestión de calendario',
+      desc: 'Sincronización de fechas en todas las plataformas. Sin superposiciones, sin errores.'
+    },
+    {
+      icon: '🧹',
+      titulo: 'Limpieza y mantenimiento',
+      desc: 'Coordinamos limpieza entre huéspedes, cortapasto, reparaciones y todo lo que tu casa necesite.'
+    },
+    {
+      icon: '💬',
+      titulo: 'Atención al huésped 24/7',
+      desc: 'Respondemos consultas, gestionamos check-in/out y resolvemos cualquier problema.'
+    },
+    {
+      icon: '📊',
+      titulo: 'Reportes de ingresos',
+      desc: 'Dashboard con tus reservas, ingresos y gastos. Todo transparente y en tiempo real.'
+    },
+    {
+      icon: '🔑',
+      titulo: 'Gestión de llaves',
+      desc: 'Coordinamos la entrega y devolución de llaves con cada huésped de forma segura.'
+    }
+  ]
 
   return (
     <div className={styles.home}>
-      {esAdmin && (
-        <button 
-          onClick={() => router.push('/admin')}
-          style={{
-            position: 'fixed',
-            top: '20px',
-            right: '80px',
-            background: 'linear-gradient(135deg, #1e3a5f 0%, #0f2942 100%)',
-            color: 'white',
-            border: 'none',
-            padding: '10px 20px',
-            borderRadius: '8px',
-            fontWeight: 'bold',
-            cursor: 'pointer',
-            fontSize: '14px',
-            boxShadow: '0 4px 6px rgba(30, 58, 95, 0.3)',
-            zIndex: 1000,
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            transition: 'all 0.2s'
-          }}
-          onMouseEnter={(e) => {
-            e.target.style.transform = 'translateY(-2px)';
-            e.target.style.boxShadow = '0 6px 12px rgba(30, 58, 95, 0.4)';
-          }}
-          onMouseLeave={(e) => {
-            e.target.style.transform = 'translateY(0)';
-            e.target.style.boxShadow = '0 4px 6px rgba(30, 58, 95, 0.3)';
-          }}
-        >
-          <span style={{fontSize: '18px'}}>🌊</span> Panel Admin
-        </button>
-      )}
 
-      <div className={styles.heroSection} style={{position: 'relative', overflow: 'hidden'}}>
-        {/* Carrusel de imágenes de fondo */}
+      {/* ============================================
+          HERO — Carrusel
+          ============================================ */}
+      <section className={styles.hero}>
+        {/* Imágenes de fondo */}
         {slides.map((slide, index) => (
           <div
             key={index}
+            className={styles.heroSlide}
             style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              width: '100%',
-              height: '100%',
-              backgroundImage: `linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)), url(${slide.image})`,
-              backgroundSize: 'cover',
+              backgroundImage: `url(${slide.image})`,
               backgroundPosition: slide.position || 'center',
-              backgroundRepeat: 'no-repeat',
               opacity: currentSlide === index ? 1 : 0,
-              transition: 'opacity 0.8s ease',
-              zIndex: currentSlide === index ? 1 : 0
             }}
           />
         ))}
 
-        {/* Nombre del lugar - ARRIBA */}
-        <div style={{
-          position: 'absolute',
-          top: '2.5rem',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          background: 'rgba(30, 58, 95, 0.95)',
-          color: 'white',
-          padding: '0.875rem 2.5rem',
-          borderRadius: '12px',
-          fontSize: '1.75rem',
-          fontWeight: 'bold',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
-          zIndex: 20
-        }}>
-          {slides[currentSlide].name}
+        {/* Overlay oscuro */}
+        <div className={styles.heroOverlay} />
+
+        {/* Nombre del destino */}
+        <div className={styles.slideName}>
+          📍 {slides[currentSlide].name}
         </div>
 
-        {/* Botón anterior */}
-        <button
-          onClick={prevSlide}
-          style={{
-            position: 'absolute',
-            left: '2rem',
-            top: '50%',
-            transform: 'translateY(-50%)',
-            background: 'rgba(255, 255, 255, 0.95)',
-            border: '2px solid #1e3a5f',
-            borderRadius: '50%',
-            width: '55px',
-            height: '55px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer',
-            fontSize: '1.75rem',
-            color: '#1e3a5f',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
-            zIndex: 20,
-            transition: 'all 0.2s',
-            fontWeight: 'bold'
-          }}
-          onMouseEnter={(e) => {
-            e.target.style.transform = 'translateY(-50%) scale(1.15)';
-            e.target.style.background = '#1e3a5f';
-            e.target.style.color = 'white';
-          }}
-          onMouseLeave={(e) => {
-            e.target.style.transform = 'translateY(-50%) scale(1)';
-            e.target.style.background = 'rgba(255, 255, 255, 0.95)';
-            e.target.style.color = '#1e3a5f';
-          }}
-        >
-          ←
-        </button>
-
-        {/* Botón siguiente */}
-        <button
-          onClick={nextSlide}
-          style={{
-            position: 'absolute',
-            right: '2rem',
-            top: '50%',
-            transform: 'translateY(-50%)',
-            background: 'rgba(255, 255, 255, 0.95)',
-            border: '2px solid #1e3a5f',
-            borderRadius: '50%',
-            width: '55px',
-            height: '55px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer',
-            fontSize: '1.75rem',
-            color: '#1e3a5f',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
-            zIndex: 20,
-            transition: 'all 0.2s',
-            fontWeight: 'bold'
-          }}
-          onMouseEnter={(e) => {
-            e.target.style.transform = 'translateY(-50%) scale(1.15)';
-            e.target.style.background = '#1e3a5f';
-            e.target.style.color = 'white';
-          }}
-          onMouseLeave={(e) => {
-            e.target.style.transform = 'translateY(-50%) scale(1)';
-            e.target.style.background = 'rgba(255, 255, 255, 0.95)';
-            e.target.style.color = '#1e3a5f';
-          }}
-        >
-          →
-        </button>
-
-        {/* BARRA DE BÚSQUEDA Y TEXTO - ABAJO */}
-        <div style={{
-          position: 'absolute',
-          bottom: '5.5rem',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          width: '90%',
-          maxWidth: '700px',
-          zIndex: 15,
-          textAlign: 'center'
-        }}>
-          <p style={{
-            color: 'white',
-            fontSize: '1.25rem',
-            fontWeight: '600',
-            marginBottom: '1.5rem',
-            textShadow: '0 2px 4px rgba(0,0,0,0.5)'
-          }}>
-            Gestión profesional de alquileres temporales
+        {/* Contenido central */}
+        <div className={styles.heroContent}>
+          <h1 className={styles.heroTitle}>
+            Dejá tu propiedad en<br />nuestras manos
+          </h1>
+          <p className={styles.heroSubtitle}>
+            Gestionamos tu alquiler temporal de forma integral.<br />
+            Publicación, reservas, limpieza y atención al huésped.
           </p>
-          <div className={styles.searchBar}>
-            <input 
-              type="text" 
-              placeholder="Busca propiedades asociadas en la plataforma"
-              className={styles.searchInput}
-            />
-            <Link href="/mis-propiedades" className={styles.searchBtn}>
-              Buscar
+          <div className={styles.heroCtas}>
+            <Link href={user ? '/publicar' : '/login'} className={styles.ctaPrimary}>
+              Publicá tu casa
             </Link>
+            <a href="#como-funciona" className={styles.ctaSecondary}>
+              ¿Cómo funciona?
+            </a>
           </div>
         </div>
 
-        {/* Indicadores de posición - ABAJO */}
-        <div style={{
-          position: 'absolute',
-          bottom: '2rem',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          display: 'flex',
-          gap: '0.75rem',
-          zIndex: 20
-        }}>
+        {/* Flechas */}
+        <button onClick={prevSlide} className={`${styles.heroArrow} ${styles.arrowLeft}`} aria-label="Anterior">
+          ‹
+        </button>
+        <button onClick={nextSlide} className={`${styles.heroArrow} ${styles.arrowRight}`} aria-label="Siguiente">
+          ›
+        </button>
+
+        {/* Indicadores */}
+        <div className={styles.heroDots}>
           {slides.map((_, index) => (
             <button
               key={index}
               onClick={() => setCurrentSlide(index)}
-              style={{
-                width: currentSlide === index ? '40px' : '12px',
-                height: '12px',
-                borderRadius: '6px',
-                border: '2px solid white',
-                background: currentSlide === index ? '#1e3a5f' : 'rgba(255, 255, 255, 0.6)',
-                cursor: 'pointer',
-                transition: 'all 0.3s',
-                boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
-              }}
+              className={`${styles.dot} ${currentSlide === index ? styles.dotActive : ''}`}
+              aria-label={`Ir a slide ${index + 1}`}
             />
           ))}
         </div>
-      </div>
+      </section>
 
-      <div className={styles.content}>
-        <p className={styles.noResults}>No se encontraron propiedades</p>
-      </div>
+      {/* ============================================
+          CÓMO FUNCIONA
+          ============================================ */}
+      <section id="como-funciona" className={`section-padding ${styles.comofunciona}`}>
+        <div className="container" style={{ textAlign: 'center' }}>
+          <span className="section-label">Proceso simple</span>
+          <h2 className="section-title">¿Cómo funciona?</h2>
+          <p className="section-subtitle" style={{ margin: '0 auto 3rem' }}>
+            En 4 simples pasos empezás a generar ingresos con tu propiedad sin moverte de tu casa.
+          </p>
+
+          <div className={styles.pasosGrid}>
+            {pasos.map((paso, i) => (
+              <div key={i} className={styles.pasoCard}>
+                <div className={styles.pasoNumber}>{i + 1}</div>
+                <div className={styles.pasoIcon}>{paso.icon}</div>
+                <h3 className={styles.pasoTitulo}>{paso.titulo}</h3>
+                <p className={styles.pasoDesc}>{paso.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ============================================
+          SERVICIOS
+          ============================================ */}
+      <section id="servicios" className={`section-padding ${styles.serviciosSection}`}>
+        <div className="container">
+          <div style={{ textAlign: 'center' }}>
+            <span className="section-label">Todo incluido</span>
+            <h2 className="section-title">¿Qué hacemos por vos?</h2>
+            <p className="section-subtitle" style={{ margin: '0 auto 3rem' }}>
+              Nos encargamos de absolutamente todo para que vos solo disfrutes de los ingresos.
+            </p>
+          </div>
+
+          <div className={styles.serviciosGrid}>
+            {servicios.map((serv, i) => (
+              <div key={i} className={styles.servicioCard}>
+                <div className={styles.servicioIcon}>{serv.icon}</div>
+                <h3 className={styles.servicioTitulo}>{serv.titulo}</h3>
+                <p className={styles.servicioDesc}>{serv.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ============================================
+          PROPIEDADES
+          ============================================ */}
+      <section id="propiedades" className={`section-padding ${styles.propiedadesSection}`}>
+        <div className="container">
+          <div style={{ textAlign: 'center' }}>
+            <span className="section-label">Portfolio</span>
+            <h2 className="section-title">Propiedades que gestionamos</h2>
+            <p className="section-subtitle" style={{ margin: '0 auto 3rem' }}>
+              Estas son algunas de las propiedades que ya confían en nosotros.
+            </p>
+          </div>
+
+          {propiedades.length > 0 ? (
+            <div className={styles.propiedadesGrid}>
+              {propiedades.map((prop) => (
+                <div key={prop.id} className={styles.propiedadCard}>
+                  <div
+                    className={styles.propiedadImagen}
+                    style={{
+                      backgroundImage: prop.imagenes?.[0]
+                        ? `url(${prop.imagenes[0]})`
+                        : 'linear-gradient(135deg, #1e3a5f, #2d4a6f)'
+                    }}
+                  >
+                    <span className={styles.propiedadBadge}>Disponible</span>
+                  </div>
+                  <div className={styles.propiedadInfo}>
+                    <h3 className={styles.propiedadTitulo}>{prop.titulo}</h3>
+                    <p className={styles.propiedadUbicacion}>📍 {prop.ubicacion}</p>
+                    <div className={styles.propiedadDetalles}>
+                      <span>👥 {prop.huespedes} huéspedes</span>
+                      <span>🛏️ {prop.dormitorios} dorm.</span>
+                    </div>
+                    <div className={styles.propiedadPrecio}>
+                      <span className={styles.precioValor}>${prop.precioPorNoche}</span>
+                      <span className={styles.precioNoche}>/ noche</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className={styles.propiedadesEmpty}>
+              <div className={styles.emptyIcon}>🏡</div>
+              <h3>Próximamente</h3>
+              <p>Estamos incorporando propiedades. ¡Sé el primero en publicar la tuya!</p>
+              <Link href={user ? '/publicar' : '/login'} className={styles.ctaPrimary}>
+                Publicá tu propiedad
+              </Link>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* ============================================
+          CTA FINAL
+          ============================================ */}
+      <section className={styles.ctaSection}>
+        <div className="container" style={{ textAlign: 'center' }}>
+          <h2 className={styles.ctaTitulo}>
+            ¿Tenés una propiedad sin explotar?
+          </h2>
+          <p className={styles.ctaSubtitulo}>
+            Dejanos encargarnos de todo. Empezá a generar ingresos con tu casa hoy mismo.
+          </p>
+          <div className={styles.ctaButtons}>
+            <Link href={user ? '/publicar' : '/login'} className={styles.ctaPrimaryLarge}>
+              Quiero publicar mi casa
+            </Link>
+            <a
+              href="https://wa.me/59895532294?text=Hola!%20Quiero%20información%20sobre%20el%20servicio%20de%20gestión%20de%20alquileres"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.ctaWhatsapp}
+            >
+              💬 Hablemos por WhatsApp
+            </a>
+          </div>
+        </div>
+      </section>
+
     </div>
   )
 }
