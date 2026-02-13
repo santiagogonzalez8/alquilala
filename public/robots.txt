@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://alquilala.vercel.app/sitemap.xml
+
+# Disallow admin
+Disallow: /admin
+Disallow: /mi-panel
+Disallow: /perfil

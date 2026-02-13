@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation'
 import { auth } from '@/lib/firebase'
 import { onAuthStateChanged } from 'firebase/auth'
 import Navbar from '@/components/Navbar'
+import ScrollToTop from '@/components/ScrollToTop'
 
 export default function LayoutClient({ children }) {
   const pathname = usePathname()
@@ -26,30 +27,31 @@ export default function LayoutClient({ children }) {
     return (
       <div className="loading-screen">
         <div className="loading-spinner"></div>
-        Cargando...
+        <span>Cargando...</span>
       </div>
     )
   }
 
   return (
     <>
-      {/* Navbar se muestra siempre EXCEPTO en login y admin */}
       {!isLoginPage && !isAdminPage && <Navbar user={user} />}
-      
+
       <main>{children}</main>
-      
-      {/* Footer se muestra siempre EXCEPTO en login y admin */}
+
       {!isLoginPage && !isAdminPage && (
-        <footer className="footer">
-          <div className="footer-links">
-            <a href="/ayuda">Ayuda</a>
-            <a href="/soporte">Contacto</a>
-            <a href="https://wa.me/59895532294" target="_blank" rel="noopener noreferrer">WhatsApp</a>
-          </div>
-          <div className="footer-bottom">
-            <p>© 2025 Alquilala — Gestión profesional de alquileres temporales en Uruguay</p>
-          </div>
-        </footer>
+        <>
+          <ScrollToTop />
+          <footer className="footer">
+            <div className="footer-links">
+              <a href="/ayuda">Ayuda</a>
+              <a href="/soporte">Contacto</a>
+              <a href="https://wa.me/59895532294" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+            </div>
+            <div className="footer-bottom">
+              <p>© 2025 Alquilala — Gestión profesional de alquileres temporales en Uruguay</p>
+            </div>
+          </footer>
+        </>
       )}
     </>
   )
