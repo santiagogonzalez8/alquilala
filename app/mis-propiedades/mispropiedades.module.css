@@ -1,0 +1,136 @@
+.page { padding-top: var(--navbar-height); min-height: 100vh; background: var(--color-bg-warm); }
+
+.header {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+  padding: 4rem 2rem 3rem;
+  text-align: center;
+}
+
+.headerContent { max-width: 600px; margin: 0 auto; }
+.headerTitle { font-size: 2.25rem; font-weight: 800; color: white; margin-bottom: 0.75rem; }
+.headerSubtitle { font-size: 1.1rem; color: rgba(255, 255, 255, 0.8); }
+
+.content { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+
+.searchBar {
+  display: flex; gap: 1rem; margin-bottom: 2rem;
+  background: white; padding: 1rem; border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-sm); border: 1px solid var(--color-border-light);
+  align-items: center;
+}
+
+.searchInput {
+  flex: 1; border: 2px solid var(--color-border); border-radius: var(--radius-sm);
+  padding: 0.75rem 1rem; font-size: 0.95rem; font-family: inherit; transition: border-color 0.2s;
+}
+
+.searchInput:focus { outline: none; border-color: var(--color-primary); }
+
+.btnNew {
+  background: var(--color-accent); color: white; border: none;
+  padding: 0.75rem 1.25rem; border-radius: var(--radius-sm);
+  font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: all 0.2s;
+  white-space: nowrap; font-family: inherit;
+}
+
+.btnNew:hover { background: var(--color-accent-hover); transform: translateY(-1px); }
+
+.grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem;
+}
+
+.card {
+  background: white; border-radius: var(--radius-md); overflow: hidden;
+  border: 1px solid var(--color-border-light);
+  transition: transform 0.25s, box-shadow 0.25s;
+}
+
+.card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+
+.cardImage {
+  height: 200px; background-size: cover; background-position: center;
+  position: relative; display: flex; align-items: center; justify-content: center;
+  font-size: 3rem; color: white;
+}
+
+.badge {
+  position: absolute; top: 0.75rem; right: 0.75rem;
+  padding: 0.3rem 0.75rem; border-radius: var(--radius-full);
+  font-size: 0.75rem; font-weight: 700; text-transform: capitalize;
+}
+
+.badgeGreen { background: #d1fae5; color: #065f46; }
+.badgeYellow { background: #fef3c7; color: #92400e; }
+.badgeBlue { background: #dbeafe; color: #1e40af; }
+.badgeRed { background: #fee2e2; color: #991b1b; }
+
+.typeBadge {
+  position: absolute; top: 0.75rem; left: 0.75rem;
+  background: rgba(30, 58, 95, 0.85); color: white;
+  padding: 0.25rem 0.6rem; border-radius: 4px;
+  font-size: 0.75rem; font-weight: 600;
+}
+
+.cardBody { padding: 1.25rem; }
+
+.cardTitle {
+  font-size: 1.1rem; font-weight: 700; color: var(--color-text);
+  margin-bottom: 0.35rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+.cardLocation { font-size: 0.85rem; color: var(--color-text-light); margin-bottom: 0.75rem; }
+
+.cardDetails {
+  display: flex; gap: 1rem; font-size: 0.85rem; color: var(--color-text-muted); margin-bottom: 1rem;
+}
+
+.cardFooter {
+  display: flex; justify-content: space-between; align-items: center;
+  padding-top: 0.75rem; border-top: 1px solid var(--color-border-light);
+}
+
+.cardPrice { display: flex; align-items: baseline; gap: 0.2rem; }
+.priceValue { font-size: 1.3rem; font-weight: 800; color: var(--color-primary); }
+.priceLabel { font-size: 0.85rem; color: var(--color-text-muted); }
+
+.btnDelete {
+  background: #fee2e2; border: none; width: 36px; height: 36px;
+  border-radius: 50%; cursor: pointer; font-size: 1rem;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.2s;
+}
+
+.btnDelete:hover { background: #fecaca; }
+
+/* Empty */
+.emptyState {
+  text-align: center; padding: 4rem 2rem; background: white;
+  border-radius: var(--radius-md); box-shadow: var(--shadow-sm);
+}
+
+.emptyIcon { font-size: 3.5rem; margin-bottom: 1rem; }
+.emptyState h3 { font-size: 1.3rem; font-weight: 700; color: var(--color-primary); margin-bottom: 0.5rem; }
+.emptyState p { color: var(--color-text-light); margin-bottom: 1.5rem; }
+
+.btnPrimary {
+  background: var(--color-primary); color: white; border: none;
+  padding: 0.8rem 2rem; border-radius: var(--radius-sm);
+  font-weight: 700; cursor: pointer; font-size: 1rem;
+  transition: all 0.2s; font-family: inherit;
+}
+
+.btnPrimary:hover { background: var(--color-primary-light); transform: translateY(-1px); }
+
+.btnLink {
+  background: none; border: none; color: var(--color-primary);
+  cursor: pointer; text-decoration: underline; font-size: 0.95rem;
+  font-family: inherit;
+}
+
+@media (max-width: 768px) {
+  .header { padding: 3rem 1.25rem 2rem; }
+  .headerTitle { font-size: 1.75rem; }
+  .content { padding: 1.5rem 1.25rem; }
+  .searchBar { flex-direction: column; }
+  .grid { grid-template-columns: 1fr; }
+}

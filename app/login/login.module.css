@@ -1,119 +1,163 @@
+/* ============================================
+   LOGIN PAGE — Split layout
+   ============================================ */
 .container {
   min-height: 100vh;
-  height: 100vh;
+  display: flex;
+}
+
+/* ---- Lado izquierdo: Branding ---- */
+.brandSide {
+  flex: 1;
+  position: relative;
+  background-image: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200');
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: flex-end;
+  padding: 3rem;
+}
+
+.brandOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(15, 41, 66, 0.6) 0%,
+    rgba(15, 41, 66, 0.85) 100%
+  );
+}
+
+.brandContent {
+  position: relative;
+  
+  color: white;
+  max-width: 480px;
+}
+
+.brandLogo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: white;
+  text-decoration: none;
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-bottom: 2rem;
+}
+
+.brandTitle {
+  font-size: 2rem;
+  font-weight: 800;
+  line-height: 1.2;
+  margin-bottom: 1rem;
+}
+
+.brandText {
+  font-size: 1.05rem;
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.7;
+  margin-bottom: 2rem;
+}
+
+.brandFeatures {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.brandFeature {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.1);
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  backdrop-filter: blur(4px);
+}
+
+.brandFeature span {
+  font-size: 1.2rem;
+}
+
+/* ---- Lado derecho: Formulario ---- */
+.formSide {
+  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: white;
   padding: 2rem;
-  overflow: hidden;
-}
-
-.loginBox {
   background: white;
-  border: 2px solid #e5e7eb;
-  border-radius: 16px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-  padding: 3rem;
+  max-width: 560px;
+}
+
+.formContainer {
   width: 100%;
-  max-width: 440px;
+  max-width: 400px;
 }
 
-.logo {
-  text-align: center;
+.formHeader {
   margin-bottom: 2rem;
 }
 
-.logo svg {
-  margin: 0 auto 1rem;
+.formHeader h1 {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--color-primary);
+  margin-bottom: 0.4rem;
 }
 
-.logo h1 {
-  font-size: 2rem;
-  color: #1e3a5f;
-  margin: 0;
-  font-weight: bold;
+.formHeader p {
+  color: var(--color-text-light);
+  font-size: 0.95rem;
 }
 
-.subtitle {
-  text-align: center;
-  color: #6b7280;
-  font-size: 1.125rem;
-  margin-bottom: 2rem;
-}
-
+/* Error */
 .error {
-  background: #fee2e2;
+  background: #fef2f2;
   color: #991b1b;
-  padding: 0.875rem;
-  border-radius: 8px;
+  border: 1px solid #fecaca;
+  padding: 0.8rem 1rem;
+  border-radius: var(--radius-sm);
   margin-bottom: 1.5rem;
-  font-size: 0.875rem;
-  text-align: center;
+  font-size: 0.9rem;
   font-weight: 500;
 }
 
-.form {
-  margin-bottom: 1.5rem;
-}
-
-.inputGroup {
-  margin-bottom: 1.25rem;
-}
-
-.inputGroup label {
-  display: block;
-  color: #1e3a5f;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-  font-size: 0.875rem;
-}
-
-.inputGroup input {
+/* Google Button */
+.btnGoogle {
   width: 100%;
-  padding: 0.875rem;
-  border: 2px solid #e5e7eb;
-  border-radius: 8px;
-  font-size: 1rem;
-  transition: border 0.2s;
+  background: white;
+  color: var(--color-text);
+  border: 2px solid var(--color-border);
+  padding: 0.8rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  transition: all 0.2s;
   font-family: inherit;
 }
 
-.inputGroup input:focus {
-  outline: none;
-  border-color: #1e3a5f;
+.btnGoogle:hover:not(:disabled) {
+  border-color: var(--color-primary);
+  background: #f9fafb;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
 }
 
-.inputGroup input:disabled {
-  background: #f3f4f6;
+.btnGoogle:disabled {
+  opacity: 0.5;
   cursor: not-allowed;
 }
 
-.btnPrimary {
-  width: 100%;
-  background: linear-gradient(135deg, #1e3a5f 0%, #0f2942 100%);
-  color: white;
-  border: none;
-  padding: 1rem;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
-  margin-top: 0.5rem;
-}
-
-.btnPrimary:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 16px rgba(30, 58, 95, 0.3);
-}
-
-.btnPrimary:disabled {
-  background: #9ca3af;
-  cursor: not-allowed;
-  transform: none;
-}
-
+/* Divider */
 .divider {
   text-align: center;
   margin: 1.5rem 0;
@@ -125,80 +169,183 @@
   content: '';
   position: absolute;
   top: 50%;
-  width: 45%;
+  width: 42%;
   height: 1px;
-  background: #e5e7eb;
+  background: var(--color-border);
 }
 
-.divider::before {
-  left: 0;
-}
-
-.divider::after {
-  right: 0;
-}
+.divider::before { left: 0; }
+.divider::after { right: 0; }
 
 .divider span {
   background: white;
   padding: 0 1rem;
-  color: #6b7280;
-  font-size: 0.875rem;
-  position: relative;
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
 }
 
-.btnGoogle {
-  width: 100%;
-  background: white;
-  color: #374151;
-  border: 2px solid #e5e7eb;
-  padding: 0.875rem;
-  border-radius: 8px;
-  font-size: 1rem;
+/* Form */
+.form {
+  margin-bottom: 1rem;
+}
+
+.inputGroup {
+  margin-bottom: 1.25rem;
+}
+
+.inputGroup label {
+  display: block;
+  color: var(--color-primary);
   font-weight: 600;
+  margin-bottom: 0.4rem;
+  font-size: 0.875rem;
+}
+
+.inputGroup input {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: 0.95rem;
+  transition: border-color 0.2s;
+  font-family: inherit;
+  background: white;
+}
+
+.inputGroup input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.inputGroup input:disabled {
+  background: #f8f8f8;
+  cursor: not-allowed;
+}
+
+/* Primary button */
+.btnPrimary {
+  width: 100%;
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  padding: 0.85rem;
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  font-weight: 700;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.75rem;
   transition: all 0.2s;
+  font-family: inherit;
 }
 
-.btnGoogle:hover:not(:disabled) {
-  border-color: #1e3a5f;
-  background: #f9fafb;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+.btnPrimary:hover:not(:disabled) {
+  background: var(--color-primary-light);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(30, 58, 95, 0.3);
 }
 
-.btnGoogle:disabled {
-  opacity: 0.5;
+.btnPrimary:disabled {
+  background: var(--color-text-muted);
   cursor: not-allowed;
   transform: none;
 }
 
+/* Toggle */
 .toggle {
   text-align: center;
-  color: #6b7280;
-  font-size: 0.875rem;
-  margin-top: 1.5rem;
+  color: var(--color-text-light);
+  font-size: 0.9rem;
+  margin-top: 1.25rem;
 }
 
 .toggle button {
   background: none;
   border: none;
-  color: #1e3a5f;
-  font-weight: 600;
+  color: var(--color-primary);
+  font-weight: 700;
   cursor: pointer;
-  text-decoration: underline;
-  font-size: 0.875rem;
+  font-size: 0.9rem;
   padding: 0;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  font-family: inherit;
 }
 
 .toggle button:hover:not(:disabled) {
-  color: #0f2942;
+  color: var(--color-primary-dark);
 }
 
 .toggle button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+/* Back home link */
+.backHome {
+  display: block;
+  text-align: center;
+  margin-top: 2rem;
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.backHome:hover {
+  color: var(--color-primary);
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 900px) {
+  .container {
+    flex-direction: column;
+  }
+
+  .brandSide {
+    flex: none;
+    min-height: 280px;
+    padding: 2rem;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .brandTitle {
+    font-size: 1.5rem;
+  }
+
+  .brandText {
+    font-size: 0.95rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .brandFeatures {
+    display: none;
+  }
+
+  .formSide {
+    flex: none;
+    max-width: 100%;
+    padding: 2rem 1.5rem 3rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .brandSide {
+    min-height: 220px;
+    padding: 1.5rem;
+  }
+
+  .brandTitle {
+    font-size: 1.25rem;
+  }
+
+  .formSide {
+    padding: 1.5rem 1.25rem 2rem;
+  }
+
+  .formHeader h1 {
+    font-size: 1.5rem;
+  }
 }

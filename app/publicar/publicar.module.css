@@ -1,0 +1,297 @@
+.page {
+  padding-top: var(--navbar-height);
+  min-height: 100vh;
+  background: var(--color-bg-warm);
+}
+
+.header {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+  padding: 4rem 2rem 3rem;
+  text-align: center;
+}
+
+.headerContent { max-width: 600px; margin: 0 auto; }
+
+.headerTitle {
+  font-size: 2.25rem;
+  font-weight: 800;
+  color: white;
+  margin-bottom: 0.75rem;
+}
+
+.headerSubtitle {
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.6;
+}
+
+.content {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2.5rem 2rem 4rem;
+}
+
+.formCard {
+  background: white;
+  border-radius: var(--radius-md);
+  padding: 2rem;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--color-border-light);
+}
+
+.section {
+  margin-bottom: 2.5rem;
+}
+
+.sectionTitle {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.sectionHint {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  margin-bottom: 1rem;
+}
+
+/* Form groups */
+.formGroup {
+  margin-bottom: 1.25rem;
+}
+
+.formGroup label {
+  display: block;
+  font-weight: 600;
+  color: var(--color-primary);
+  margin-bottom: 0.4rem;
+  font-size: 0.9rem;
+}
+
+.formGroup input,
+.formGroup select,
+.formGroup textarea {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: 0.95rem;
+  font-family: inherit;
+  transition: border-color 0.2s;
+  background: white;
+}
+
+.formGroup input:focus,
+.formGroup select:focus,
+.formGroup textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.formRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.formRow3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1rem;
+}
+
+/* Photos */
+.photosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.photoItem {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  border: 2px solid var(--color-border);
+  cursor: grab;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.photoItem:hover {
+  transform: scale(1.02);
+  box-shadow: var(--shadow-md);
+}
+
+.photoItem img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+.photoBadge {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  background: var(--color-primary);
+  color: white;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 0.65rem;
+  font-weight: 700;
+}
+
+.photoNumber {
+  position: absolute;
+  top: 6px;
+  right: 30px;
+  background: rgba(30, 58, 95, 0.85);
+  color: white;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  font-size: 0.7rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.photoDelete {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  background: var(--color-danger);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s;
+}
+
+.photoDelete:hover {
+  transform: scale(1.1);
+}
+
+.uploadArea {
+  display: block;
+  width: 100%;
+  padding: 1.5rem;
+  border: 2px dashed var(--color-primary);
+  border-radius: var(--radius-sm);
+  text-align: center;
+  cursor: pointer;
+  background: rgba(30, 58, 95, 0.03);
+  font-weight: 600;
+  color: var(--color-primary);
+  font-size: 0.95rem;
+  transition: all 0.2s;
+}
+
+.uploadArea:hover {
+  background: rgba(30, 58, 95, 0.07);
+}
+
+/* Amenities */
+.amenitiesGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.amenityBtn {
+  padding: 0.65rem;
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--color-border);
+  background: white;
+  color: var(--color-text);
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+
+.amenityBtn:hover {
+  border-color: var(--color-primary);
+}
+
+.amenityActive {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: white;
+}
+
+/* Submit */
+.btnSubmit {
+  width: 100%;
+  background: var(--color-accent);
+  color: white;
+  border: none;
+  padding: 1rem;
+  border-radius: var(--radius-sm);
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.btnSubmit:hover:not(:disabled) {
+  background: var(--color-accent-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(201, 149, 107, 0.4);
+}
+
+.btnSubmit:disabled {
+  background: var(--color-text-muted);
+  cursor: not-allowed;
+}
+
+.photoWarning {
+  text-align: center;
+  color: var(--color-danger);
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+}
+
+/* Toast */
+.toast {
+  position: fixed;
+  top: calc(var(--navbar-height) + 1rem);
+  right: 1rem;
+  background: var(--color-success);
+  color: white;
+  padding: 1rem 1.5rem;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-lg);
+  z-index: 1000;
+  font-weight: 600;
+  font-size: 0.95rem;
+  animation: toastIn 0.3s ease;
+}
+
+@keyframes toastIn {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@media (max-width: 768px) {
+  .header { padding: 3rem 1.25rem 2rem; }
+  .headerTitle { font-size: 1.75rem; }
+  .content { padding: 1.5rem 1.25rem 3rem; }
+  .formCard { padding: 1.5rem; }
+  .formRow, .formRow3 { grid-template-columns: 1fr; }
+  .amenitiesGrid { grid-template-columns: repeat(2, 1fr); }
+}
