@@ -16,11 +16,14 @@ function MiPanelContenido() {
 
   useEffect(() => {
     const cargar = async () => {
-      if (!auth.currentUser) return;
+      const user = auth.currentUser;
+      if (!user) return;
+
       try {
+        // Cargar en paralelo
         const [propSnap, resSnap] = await Promise.all([
-          getDocs(query(collection(db, 'propiedades'), where('userId', '==', auth.currentUser.uid))),
-          getDocs(query(collection(db, 'reservas'), where('userId', '==', auth.currentUser.uid))),
+          getDocs(query(collection(db, 'propiedades'), where('userId', '==', user.uid))),
+          getDocs(query(collection(db, 'reservas'), where('userId', '==', user.uid))),
         ]);
         setPropiedades(propSnap.docs.map(d => ({ id: d.id, ...d.data() })));
         setReservas(resSnap.docs.map(d => ({ id: d.id, ...d.data() })));
@@ -30,7 +33,10 @@ function MiPanelContenido() {
         setLoading(false);
       }
     };
-    cargar();
+
+    // Pequeño delay para asegurar que auth.currentUser está listo
+    const timer = setTimeout(cargar, 100);
+    return () => clearTimeout(timer);
   }, []);
 
   const propActivas = propiedades.filter(p => p.estado === 'disponible').length;
@@ -44,62 +50,51 @@ function MiPanelContenido() {
   if (loading) {
     return (
       <div className={styles.page}>
-        <div className="loading-screen">
-          <div className="loading-spinner"></div>
-          Cargando tu panel...
+        <div className={styles.header}>
+          <div className={styles.headerContent}>
+            <h1 className={styles.headerTitle}>Cargando tu panel...</h1>
+          </div>
+        </div>
+        <div className={styles.content}>
+          <div style={{ textAlign: 'center', padding: '3rem' }}>
+            <div className="loading-spinner" style={{ margin: '0 auto 1rem' }}></div>
+          </div>
         </div>
       </div>
     );
   }
 
+  const nombre = auth.currentUser?.displayName?.split(' ')[0] || 'propietario';
+
   return (
     <div className={styles.page}>
-      {/* Header */}
       <div className={styles.header}>
         <div className={styles.headerContent}>
-          <h1 className={styles.headerTitle}>
-            ¡Hola, {auth.currentUser?.displayName?.split(' ')[0] || 'propietario'}! 👋
-          </h1>
-          <p className={styles.headerSubtitle}>
-            Este es el resumen de tu actividad en Alquilala
-          </p>
+          <h1 className={styles.headerTitle}>¡Hola, {nombre}! 👋</h1>
+          <p className={styles.headerSubtitle}>Este es el resumen de tu actividad en Alquilala</p>
         </div>
       </div>
 
       <div className={styles.content}>
-        {/* Stats */}
         <div className={styles.statsGrid}>
           <div className={styles.statCard} onClick={() => router.push('/mis-propiedades')}>
             <div className={styles.statIcon}>🏠</div>
-            <div>
-              <p className={styles.statLabel}>Propiedades activas</p>
-              <p className={styles.statValue}>{propActivas}</p>
-            </div>
+            <div><p className={styles.statLabel}>Propiedades activas</p><p className={styles.statValue}>{propActivas}</p></div>
           </div>
           <div className={styles.statCard}>
             <div className={styles.statIcon}>⏳</div>
-            <div>
-              <p className={styles.statLabel}>En revisión</p>
-              <p className={styles.statValue}>{propPendientes}</p>
-            </div>
+            <div><p className={styles.statLabel}>En revisión</p><p className={styles.statValue}>{propPendientes}</p></div>
           </div>
           <div className={styles.statCard} onClick={() => router.push('/mis-reservas')}>
             <div className={styles.statIcon}>📅</div>
-            <div>
-              <p className={styles.statLabel}>Reservas confirmadas</p>
-              <p className={styles.statValue}>{reservasConfirmadas}</p>
-            </div>
+            <div><p className={styles.statLabel}>Reservas confirmadas</p><p className={styles.statValue}>{reservasConfirmadas}</p></div>
           </div>
           <div className={styles.statCard}>
             <div className={styles.statIcon}>💰</div>
-            <div>
-              <p className={styles.statLabel}>Ingresos estimados</p>
-              <p className={styles.statValue}>${ingresoEstimado}</p>
-            </div>
+            <div><p className={styles.statLabel}>Ingresos estimados</p><p className={styles.statValue}>${ingresoEstimado}</p></div>
           </div>
         </div>
 
-        {/* Acciones rápidas */}
         <div className={styles.quickActions}>
           <h2 className={styles.sectionTitle}>Acciones rápidas</h2>
           <div className={styles.actionsGrid}>
@@ -122,7 +117,6 @@ function MiPanelContenido() {
           </div>
         </div>
 
-        {/* Estado de propiedades */}
         {propiedades.length > 0 && (
           <div className={styles.section}>
             <div className={styles.sectionHeader}>
@@ -147,13 +141,11 @@ function MiPanelContenido() {
                     <span className={`${styles.statusBadge} ${
                       prop.estado === 'disponible' ? styles.statusGreen :
                       prop.estado === 'pendiente' ? styles.statusYellow :
-                      prop.estado === 'pausada' ? styles.statusBlue :
-                      styles.statusRed
+                      prop.estado === 'pausada' ? styles.statusBlue : styles.statusRed
                     }`}>
                       {prop.estado === 'disponible' ? '✅ Activa' :
                        prop.estado === 'pendiente' ? '⏳ En revisión' :
-                       prop.estado === 'pausada' ? '⏸️ Pausada' :
-                       '❌ Rechazada'}
+                       prop.estado === 'pausada' ? '⏸️ Pausada' : '❌ Rechazada'}
                     </span>
                     <span className={styles.propPrice}>${prop.precioPorNoche}/noche</span>
                   </div>
@@ -163,19 +155,15 @@ function MiPanelContenido() {
           </div>
         )}
 
-        {/* Sin propiedades — CTA */}
         {propiedades.length === 0 && (
           <div className={styles.emptyState}>
             <div className={styles.emptyIcon}>🏖️</div>
             <h3>¡Empezá a generar ingresos!</h3>
-            <p>Publicá tu primera propiedad y nosotros nos encargamos de todo: publicación, reservas, limpieza y atención al huésped.</p>
-            <Link href="/publicar" className={styles.ctaBtn}>
-              Publicar mi propiedad
-            </Link>
+            <p>Publicá tu primera propiedad y nosotros nos encargamos de todo.</p>
+            <Link href="/publicar" className={styles.ctaBtn}>Publicar mi propiedad</Link>
           </div>
         )}
 
-        {/* Rechazadas — alerta */}
         {propRechazadas > 0 && (
           <div className={styles.alertBox}>
             <span>⚠️</span>
@@ -186,26 +174,13 @@ function MiPanelContenido() {
           </div>
         )}
 
-        {/* Info del servicio */}
         <div className={styles.infoBox}>
           <h3>🔔 ¿Cómo funciona el proceso?</h3>
           <div className={styles.infoSteps}>
-            <div className={styles.infoStep}>
-              <span className={styles.stepNumber}>1</span>
-              <p>Publicás tu propiedad con fotos y datos</p>
-            </div>
-            <div className={styles.infoStep}>
-              <span className={styles.stepNumber}>2</span>
-              <p>Nuestro equipo la revisa y aprueba</p>
-            </div>
-            <div className={styles.infoStep}>
-              <span className={styles.stepNumber}>3</span>
-              <p>La publicamos en Airbnb, Booking y MercadoLibre</p>
-            </div>
-            <div className={styles.infoStep}>
-              <span className={styles.stepNumber}>4</span>
-              <p>Gestionamos reservas, limpieza y huéspedes</p>
-            </div>
+            <div className={styles.infoStep}><span className={styles.stepNumber}>1</span><p>Publicás tu propiedad con fotos y datos</p></div>
+            <div className={styles.infoStep}><span className={styles.stepNumber}>2</span><p>Nuestro equipo la revisa y aprueba</p></div>
+            <div className={styles.infoStep}><span className={styles.stepNumber}>3</span><p>La publicamos en Airbnb, Booking y MercadoLibre</p></div>
+            <div className={styles.infoStep}><span className={styles.stepNumber}>4</span><p>Gestionamos reservas, limpieza y huéspedes</p></div>
           </div>
         </div>
       </div>

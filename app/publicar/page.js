@@ -24,8 +24,9 @@ function PublicarContenido() {
   });
   const [fotos, setFotos] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [uploadingPhotos, setUploadingPhotos] = useState(false);
+  const [progreso, setProgreso] = useState('');
   const [showSuccess, setShowSuccess] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
   const [draggedIndex, setDraggedIndex] = useState(null);
 
   const amenitiesDisponibles = [
@@ -34,16 +35,14 @@ function PublicarContenido() {
     'Jardín', 'Terraza', 'Lavadora', 'Secadora'
   ];
 
-  const handlePhotoUpload = async (e) => {
+  const handlePhotoUpload = (e) => {
     const files = Array.from(e.target.files);
-    setUploadingPhotos(true);
     const nuevasFotos = files.map(file => ({
       file,
       preview: URL.createObjectURL(file),
       id: Math.random().toString(36)
     }));
     setFotos(prev => [...prev, ...nuevasFotos]);
-    setUploadingPhotos(false);
   };
 
   const eliminarFoto = (id) => {
@@ -73,42 +72,72 @@ function PublicarContenido() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setErrorMsg('');
+
     if (!auth.currentUser) {
       router.push('/login');
       return;
     }
-    if (fotos.length === 0) {
-      alert('Debés agregar al menos una foto');
-      return;
-    }
+
     setLoading(true);
+
     try {
-      const fotosURLs = [];
-      for (let i = 0; i < fotos.length; i++) {
-        const foto = fotos[i];
-        const fileName = `propiedades/${auth.currentUser.uid}/${Date.now()}_${i}.jpg`;
-        const storageRef = ref(storage, fileName);
-        await uploadBytes(storageRef, foto.file);
-        const url = await getDownloadURL(storageRef);
-        fotosURLs.push(url);
+      let fotosURLs = [];
+
+      // Si hay fotos, subirlas
+      if (fotos.length > 0) {
+        setProgreso('Subiendo fotos...');
+        for (let i = 0; i < fotos.length; i++) {
+          setProgreso(`Subiendo foto ${i + 1} de ${fotos.length}...`);
+          try {
+            const foto = fotos[i];
+            const fileName = `propiedades/${auth.currentUser.uid}/${Date.now()}_${i}_${foto.file.name}`;
+            const storageRef = ref(storage, fileName);
+            await uploadBytes(storageRef, foto.file);
+            const url = await getDownloadURL(storageRef);
+            fotosURLs.push(url);
+          } catch (uploadError) {
+            console.error(`Error subiendo foto ${i + 1}:`, uploadError);
+            // Si falla una foto, seguir con las demás
+          }
+        }
       }
 
-      await addDoc(collection(db, 'propiedades'), {
-        ...formData,
+      setProgreso('Guardando propiedad...');
+
+      const propiedadData = {
+        titulo: formData.titulo,
+        ubicacion: formData.ubicacion,
+        precioPorNoche: formData.precioPorNoche,
+        descripcion: formData.descripcion,
+        huespedes: formData.huespedes,
+        dormitorios: formData.dormitorios,
+        camas: formData.camas,
+        banos: formData.banos,
+        tipoPropiedad: formData.tipoPropiedad,
+        amenities: formData.amenities,
         imagenes: fotosURLs,
-        fotoPrincipal: fotosURLs[0],
+        fotoPrincipal: fotosURLs[0] || '',
         userId: auth.currentUser.uid,
         userEmail: auth.currentUser.email,
         fechaPublicacion: new Date().toISOString(),
         estado: 'pendiente',
         temporada: 'verano'
-      });
+      };
 
+      await addDoc(collection(db, 'propiedades'), propiedadData);
+
+      setProgreso('');
       setShowSuccess(true);
-      setTimeout(() => router.push('/mis-propiedades'), 2000);
+
+      setTimeout(() => {
+        router.push('/mis-propiedades');
+      }, 2500);
+
     } catch (error) {
-      console.error('Error:', error);
-      alert(`Error al publicar: ${error.message}`);
+      console.error('Error completo:', error);
+      setErrorMsg(`Error al publicar: ${error.message}. Intentá de nuevo.`);
+      setProgreso('');
     } finally {
       setLoading(false);
     }
@@ -131,7 +160,13 @@ function PublicarContenido() {
     <div className={styles.page}>
       {showSuccess && (
         <div className={styles.toast}>
-          ✅ Tu propiedad fue enviada para revisión. ¡Te avisaremos cuando esté publicada!
+          ✅ ¡Propiedad enviada para revisión! Te avisaremos cuando esté publicada.
+        </div>
+      )}
+
+      {errorMsg && (
+        <div className={styles.toast} style={{ background: 'var(--color-danger)' }}>
+          ⚠️ {errorMsg}
         </div>
       )}
 
@@ -153,7 +188,7 @@ function PublicarContenido() {
           <div className={styles.section}>
             <h2 className={styles.sectionTitle}>📷 Fotos de la propiedad</h2>
             <p className={styles.sectionHint}>
-              La primera foto será la portada. Arrastrá para reordenar.
+              Opcional pero recomendado. La primera foto será la portada. Arrastrá para reordenar.
             </p>
 
             {fotos.length > 0 && (
@@ -171,25 +206,14 @@ function PublicarContenido() {
                     <img src={foto.preview} alt={`Foto ${index + 1}`} />
                     {index === 0 && <div className={styles.photoBadge}>PORTADA</div>}
                     <div className={styles.photoNumber}>{index + 1}</div>
-                    <button
-                      type="button"
-                      onClick={() => eliminarFoto(foto.id)}
-                      className={styles.photoDelete}
-                    >
-                      ×
-                    </button>
+                    <button type="button" onClick={() => eliminarFoto(foto.id)} className={styles.photoDelete}>×</button>
                   </div>
                 ))}
               </div>
             )}
 
             <label className={styles.uploadArea}>
-              {uploadingPhotos
-                ? '📤 Procesando...'
-                : fotos.length === 0
-                  ? '📷 Hacé clic para agregar fotos'
-                  : `📷 Agregar más fotos (${fotos.length} agregadas)`
-              }
+              {fotos.length === 0 ? '📷 Hacé clic para agregar fotos' : `📷 Agregar más fotos (${fotos.length} agregadas)`}
               <input type="file" accept="image/*" multiple onChange={handlePhotoUpload} style={{ display: 'none' }} />
             </label>
           </div>
@@ -203,7 +227,7 @@ function PublicarContenido() {
               <input
                 type="text" name="titulo" value={formData.titulo}
                 onChange={handleChange} required
-                placeholder="Ej: Casa en Punta Negra con piscina y vista al mar"
+                placeholder="Ej: Casa en Punta Negra para 6 personas con piscina y vista al mar"
               />
             </div>
 
@@ -281,14 +305,30 @@ function PublicarContenido() {
             </div>
           </div>
 
-          {/* Submit */}
-          <button type="submit" disabled={loading || uploadingPhotos} className={styles.btnSubmit}>
-            {loading ? 'Publicando...' : uploadingPhotos ? 'Procesando fotos...' : 'Enviar para revisión'}
-          </button>
-
-          {fotos.length === 0 && (
-            <p className={styles.photoWarning}>* Debés agregar al menos una foto para publicar</p>
+          {/* Progreso */}
+          {progreso && (
+            <div style={{
+              background: 'var(--color-bg-warm)',
+              border: '1px solid var(--color-border)',
+              borderRadius: 'var(--radius-sm)',
+              padding: '1rem',
+              marginBottom: '1rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.75rem',
+              fontSize: '0.95rem',
+              color: 'var(--color-primary)',
+              fontWeight: 600
+            }}>
+              <div className="loading-spinner" style={{ width: 24, height: 24, borderWidth: 2 }}></div>
+              {progreso}
+            </div>
           )}
+
+          {/* Submit */}
+          <button type="submit" disabled={loading} className={styles.btnSubmit}>
+            {loading ? progreso || 'Procesando...' : 'Enviar para revisión'}
+          </button>
         </form>
       </div>
     </div>

@@ -12,20 +12,32 @@ function PerfilContenido() {
   const [userData, setUserData] = useState({
     displayName: '', email: '', phone: '', location: '', bio: '', photoURL: ''
   })
+  const [originalData, setOriginalData] = useState(null)
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [uploading, setUploading] = useState(false)
-  const [showSuccess, setShowSuccess] = useState(false)
-  const [showPasswordSuccess, setShowPasswordSuccess] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [savingPassword, setSavingPassword] = useState(false)
+  const [toast, setToast] = useState('')
+  const [toastType, setToastType] = useState('success')
 
   useEffect(() => { loadUserData() }, [])
+
+  const showToast = (msg, type = 'success') => {
+    setToast(msg)
+    setToastType(type)
+    setTimeout(() => setToast(''), 4000)
+  }
 
   const loadUserData = async () => {
     if (!auth.currentUser) return
     try {
-      const userDoc = await getDoc(doc(db, 'users', auth.currentUser.uid))
+      const userRef = doc(db, 'users', auth.currentUser.uid)
+      const userDoc = await getDoc(userRef)
       if (userDoc.exists()) {
-        setUserData(userDoc.data())
+        const data = userDoc.data()
+        setUserData(data)
+        setOriginalData(data)
       } else {
         const initial = {
           displayName: auth.currentUser.displayName || '',
@@ -34,9 +46,13 @@ function PerfilContenido() {
           photoURL: auth.currentUser.photoURL || ''
         }
         setUserData(initial)
-        await setDoc(doc(db, 'users', auth.currentUser.uid), initial)
+        setOriginalData(initial)
+        await setDoc(userRef, { ...initial, createdAt: new Date() })
       }
-    } catch (error) { console.error('Error:', error) }
+    } catch (error) {
+      console.error('Error cargando perfil:', error)
+      showToast('Error al cargar el perfil', 'error')
+    }
   }
 
   const handleChange = (e) => {
@@ -46,53 +62,110 @@ function PerfilContenido() {
   const handlePhotoUpload = async (e) => {
     const file = e.target.files[0]
     if (!file) return
-    if (file.size > 2 * 1024 * 1024) { alert('La imagen debe ser menor a 2MB'); return }
+    if (file.size > 2 * 1024 * 1024) {
+      showToast('La imagen debe ser menor a 2MB', 'error')
+      return
+    }
+
     setUploading(true)
     try {
-      const storageRef = ref(storage, `profile-photos/${auth.currentUser.uid}`)
+      const storageRef = ref(storage, `profile-photos/${auth.currentUser.uid}_${Date.now()}`)
       await uploadBytes(storageRef, file)
       const photoURL = await getDownloadURL(storageRef)
+
+      // Actualizar en Firebase Auth
       await updateProfile(auth.currentUser, { photoURL })
-      const newData = { ...userData, photoURL }
-      setUserData(newData)
-      await updateDoc(doc(db, 'users', auth.currentUser.uid), { photoURL, updatedAt: new Date() })
-      setShowSuccess(true)
-      setTimeout(() => setShowSuccess(false), 3000)
-    } catch (error) { alert('Error al subir la foto') }
-    setUploading(false)
+
+      // Actualizar en Firestore
+      const userRef = doc(db, 'users', auth.currentUser.uid)
+      const userDoc = await getDoc(userRef)
+      if (userDoc.exists()) {
+        await updateDoc(userRef, { photoURL, updatedAt: new Date() })
+      } else {
+        await setDoc(userRef, { ...userData, photoURL, updatedAt: new Date() })
+      }
+
+      setUserData(prev => ({ ...prev, photoURL }))
+      showToast('✅ Foto actualizada correctamente')
+    } catch (error) {
+      console.error('Error subiendo foto:', error)
+      showToast('Error al subir la foto. Verificá las reglas de Firebase Storage.', 'error')
+    } finally {
+      setUploading(false)
+    }
   }
 
   const handleSaveProfile = async (e) => {
     e.preventDefault()
+    setSaving(true)
+
     try {
-      await updateProfile(auth.currentUser, { displayName: userData.displayName })
-      await updateDoc(doc(db, 'users', auth.currentUser.uid), { ...userData, updatedAt: new Date() })
-      setShowSuccess(true)
-      setTimeout(() => setShowSuccess(false), 3000)
-      await loadUserData()
-    } catch (error) { alert('Error al guardar') }
+      // Actualizar displayName en Firebase Auth
+      if (userData.displayName !== auth.currentUser.displayName) {
+        await updateProfile(auth.currentUser, { displayName: userData.displayName })
+      }
+
+      // Guardar en Firestore
+      const userRef = doc(db, 'users', auth.currentUser.uid)
+      const dataToSave = {
+        displayName: userData.displayName,
+        email: userData.email,
+        phone: userData.phone || '',
+        location: userData.location || '',
+        bio: userData.bio || '',
+        photoURL: userData.photoURL || '',
+        updatedAt: new Date()
+      }
+
+      const userDoc = await getDoc(userRef)
+      if (userDoc.exists()) {
+        await updateDoc(userRef, dataToSave)
+      } else {
+        await setDoc(userRef, { ...dataToSave, createdAt: new Date() })
+      }
+
+      setOriginalData({ ...userData })
+      showToast('✅ Perfil guardado correctamente')
+    } catch (error) {
+      console.error('Error guardando perfil:', error)
+      showToast('Error al guardar. Intentá de nuevo.', 'error')
+    } finally {
+      setSaving(false)
+    }
   }
 
   const handleChangePassword = async (e) => {
     e.preventDefault()
-    if (newPassword.length < 6) { alert('Mínimo 6 caracteres'); return }
-    if (newPassword !== confirmPassword) { alert('Las contraseñas no coinciden'); return }
+    if (newPassword.length < 6) { showToast('Mínimo 6 caracteres', 'error'); return }
+    if (newPassword !== confirmPassword) { showToast('Las contraseñas no coinciden', 'error'); return }
+
+    setSavingPassword(true)
     try {
       await updatePassword(auth.currentUser, newPassword)
-      setShowPasswordSuccess(true)
-      setTimeout(() => setShowPasswordSuccess(false), 3000)
+      showToast('✅ Contraseña actualizada')
       setNewPassword('')
       setConfirmPassword('')
-    } catch (error) { alert('Error. Volvé a iniciar sesión.') }
+    } catch (error) {
+      console.error('Error:', error)
+      if (error.code === 'auth/requires-recent-login') {
+        showToast('Por seguridad, cerrá sesión y volvé a iniciar antes de cambiar la contraseña.', 'error')
+      } else {
+        showToast('Error al cambiar contraseña', 'error')
+      }
+    } finally {
+      setSavingPassword(false)
+    }
   }
 
   const getInitials = () => userData.displayName ? userData.displayName.charAt(0).toUpperCase() : 'U'
 
   return (
     <div className={styles.page}>
-      {(showSuccess || showPasswordSuccess) && (
-        <div className={styles.toast}>
-          ✅ {showPasswordSuccess ? 'Contraseña actualizada' : 'Perfil actualizado correctamente'}
+      {toast && (
+        <div className={styles.toast} style={{
+          background: toastType === 'error' ? 'var(--color-danger)' : 'var(--color-success)'
+        }}>
+          {toast}
         </div>
       )}
 
@@ -115,10 +188,10 @@ function PerfilContenido() {
           </div>
           <div>
             <label htmlFor="photo-upload" className={styles.btnPhoto}>
-              {uploading ? 'Subiendo...' : 'Cambiar foto'}
+              {uploading ? '⏳ Subiendo...' : '📷 Cambiar foto'}
             </label>
-            <input id="photo-upload" type="file" accept="image/*" onChange={handlePhotoUpload} style={{ display: 'none' }} />
-            <p className={styles.hint}>400×400px, máx 2MB</p>
+            <input id="photo-upload" type="file" accept="image/*" onChange={handlePhotoUpload} disabled={uploading} style={{ display: 'none' }} />
+            <p className={styles.hint}>JPG o PNG, máx 2MB</p>
           </div>
         </div>
 
@@ -128,11 +201,12 @@ function PerfilContenido() {
           <form onSubmit={handleSaveProfile}>
             <div className={styles.formGroup}>
               <label>Nombre completo *</label>
-              <input type="text" name="displayName" value={userData.displayName} onChange={handleChange} required />
+              <input type="text" name="displayName" value={userData.displayName} onChange={handleChange} required placeholder="Tu nombre" />
             </div>
             <div className={styles.formGroup}>
               <label>Correo electrónico</label>
               <input type="email" value={userData.email} disabled />
+              <p className={styles.hint}>El email no se puede cambiar</p>
             </div>
             <div className={styles.formGroup}>
               <label>Teléfono</label>
@@ -146,13 +220,18 @@ function PerfilContenido() {
               <label>Sobre mí</label>
               <textarea name="bio" value={userData.bio} onChange={handleChange} rows="4" placeholder="Contanos sobre vos..." />
             </div>
-            <button type="submit" className={styles.btnSave}>Guardar Cambios</button>
+            <button type="submit" className={styles.btnSave} disabled={saving}>
+              {saving ? '⏳ Guardando...' : '💾 Guardar Cambios'}
+            </button>
           </form>
         </div>
 
         {/* Password */}
         <div className={styles.section}>
           <h3>Cambiar Contraseña</h3>
+          <p className={styles.hint} style={{ marginBottom: '1rem' }}>
+            Solo disponible si te registraste con email y contraseña (no con Google).
+          </p>
           <form onSubmit={handleChangePassword}>
             <div className={styles.formGroup}>
               <label>Nueva contraseña</label>
@@ -162,7 +241,9 @@ function PerfilContenido() {
               <label>Confirmar contraseña</label>
               <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="Repetí la contraseña" />
             </div>
-            <button type="submit" className={styles.btnSave}>Cambiar Contraseña</button>
+            <button type="submit" className={styles.btnSave} disabled={savingPassword}>
+              {savingPassword ? '⏳ Cambiando...' : '🔒 Cambiar Contraseña'}
+            </button>
           </form>
         </div>
       </div>
