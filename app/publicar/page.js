@@ -10,7 +10,7 @@ import styles from './publicar.module.css';
 // Escribir directo a Firestore via REST API (sin SDK)
 async function guardarEnFirestore(data) {
   const projectId = 'alquilala-77';
-  const url = `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents/propiedades`;
+  const url = `https://firestore.googleapis.com/v1/projects/${projectId}/databases/alquilala/documents/propiedades`;
 
   // Convertir datos a formato Firestore REST
   const fields = {};
