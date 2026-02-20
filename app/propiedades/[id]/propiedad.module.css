@@ -39,10 +39,7 @@
   color: var(--color-primary);
 }
 
-.errorPage p {
-  color: var(--color-text-light);
-  font-size: 1rem;
-}
+.errorPage p { color: var(--color-text-light); font-size: 1rem; }
 
 .btnBack {
   display: inline-block;
@@ -84,9 +81,7 @@
   transition: transform 0.3s ease;
 }
 
-.galeriaMain:hover img {
-  transform: scale(1.02);
-}
+.galeriaMain:hover img { transform: scale(1.02); }
 
 .btnVerFotos {
   position: absolute;
@@ -129,9 +124,7 @@
   transition: transform 0.3s ease;
 }
 
-.galeriaThumb:hover img {
-  transform: scale(1.05);
-}
+.galeriaThumb:hover img { transform: scale(1.05); }
 
 .galeriaThumbMore .moreOverlay {
   position: absolute;
@@ -157,9 +150,7 @@
   font-size: 4rem;
 }
 
-.galeriaPlaceholder p {
-  font-size: 1rem;
-}
+.galeriaPlaceholder p { font-size: 1rem; }
 
 /* ── Lightbox ── */
 .lightbox {
@@ -247,11 +238,9 @@
   align-items: start;
 }
 
-/* Columna izquierda */
-.columnaIzq {
-  min-width: 0;
-}
+.columnaIzq { min-width: 0; }
 
+/* Breadcrumb */
 .breadcrumb {
   display: flex;
   align-items: center;
@@ -270,6 +259,7 @@
 
 .breadcrumb a:hover { color: var(--color-primary); }
 
+/* Encabezado */
 .encabezado { margin-bottom: 1.5rem; }
 
 .badges {
@@ -380,10 +370,7 @@
   transition: border-color 0.2s;
 }
 
-.amenityItem:hover {
-  border-color: var(--color-border);
-}
-
+.amenityItem:hover { border-color: var(--color-border); }
 .amenityIcon { font-size: 1.2rem; flex-shrink: 0; }
 
 .amenityNombre {
@@ -399,11 +386,7 @@
   gap: 1rem;
 }
 
-.infoItem {
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-}
+.infoItem { display: flex; flex-direction: column; gap: 0.2rem; }
 
 .infoLabel {
   font-size: 0.78rem;
@@ -417,6 +400,161 @@
   font-size: 0.95rem;
   color: var(--color-text);
   font-weight: 600;
+}
+
+/* ══════════════════════════════════════════════
+   CALENDARIO DE DISPONIBILIDAD
+══════════════════════════════════════════════ */
+
+.calendario {
+  background: var(--color-bg-warm);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-md);
+  padding: 1.5rem;
+  max-width: 480px;
+}
+
+.calNav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+}
+
+.calNavBtn {
+  background: white;
+  border: 1px solid var(--color-border);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  font-size: 1.3rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+  color: var(--color-primary);
+  line-height: 1;
+}
+
+.calNavBtn:hover:not(:disabled) {
+  background: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
+}
+
+.calNavBtn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.calMes {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.calGrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 3px;
+  margin-bottom: 1rem;
+}
+
+.calDiaSemana {
+  text-align: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  padding: 0.3rem 0;
+  letter-spacing: 0.3px;
+}
+
+.calCelda {
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  font-size: 0.88rem;
+  font-weight: 500;
+  position: relative;
+  transition: all 0.15s;
+  line-height: 1;
+  gap: 1px;
+}
+
+.calDisponible {
+  background: white;
+  color: var(--color-text);
+  border: 1px solid var(--color-border-light);
+}
+
+.calOcupado {
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+  font-weight: 600;
+}
+
+.calPasado {
+  background: transparent;
+  color: var(--color-border);
+  border: 1px solid transparent;
+  cursor: default;
+}
+
+.calHoy {
+  border: 2px solid var(--color-primary) !important;
+  font-weight: 700;
+}
+
+.calDot {
+  font-size: 0.45rem;
+  color: #ef4444;
+  line-height: 1;
+  height: 6px;
+}
+
+/* Leyenda */
+.calLeyenda {
+  display: flex;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--color-border-light);
+}
+
+.calLeyendaItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.82rem;
+  color: var(--color-text-light);
+}
+
+.calLeyendaDot {
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.dotDisponible {
+  background: white;
+  border: 1px solid var(--color-border);
+}
+
+.dotOcupado {
+  background: #fee2e2;
+  border: 1px solid #fecaca;
+}
+
+.dotPasado {
+  background: transparent;
+  border: 1px solid var(--color-border-light);
 }
 
 /* ── Columna derecha ── */
@@ -561,6 +699,8 @@
   .btnReserva { grid-column: 1 / -1; }
   .reservaHint { grid-column: 1 / -1; margin-bottom: 0; }
   .reservaGestionado { grid-column: 1 / -1; }
+
+  .calendario { max-width: 100%; }
 }
 
 @media (max-width: 768px) {
@@ -569,9 +709,7 @@
     max-height: none;
   }
 
-  .galeriaMain img {
-    height: 280px;
-  }
+  .galeriaMain img { height: 280px; }
 
   .galeriaThumbs {
     grid-template-rows: none;
@@ -579,32 +717,16 @@
     max-height: 100px;
   }
 
-  .contenido {
-    padding: 1.5rem 1.25rem 3rem;
-  }
+  .contenido { padding: 1.5rem 1.25rem 3rem; }
+  .titulo { font-size: 1.5rem; }
+  .capacidadGrid { gap: 1rem; }
+  .amenitiesGrid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
 
-  .titulo {
-    font-size: 1.5rem;
-  }
+  .reservaCard { grid-template-columns: 1fr; }
 
-  .capacidadGrid {
-    gap: 1rem;
-  }
-
-  .amenitiesGrid {
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-  }
-
-  .reservaCard {
-    grid-template-columns: 1fr;
-  }
-
-  .lightboxArrow {
-    width: 40px;
-    height: 40px;
-    font-size: 1.5rem;
-  }
-
+  .lightboxArrow { width: 40px; height: 40px; font-size: 1.5rem; }
   .lightboxLeft { left: 0.75rem; }
   .lightboxRight { right: 0.75rem; }
+
+  .calCelda { font-size: 0.78rem; }
 }

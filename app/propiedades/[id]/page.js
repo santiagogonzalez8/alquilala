@@ -7,87 +7,156 @@ import { firestoreGetPublicById } from '@/lib/firebase';
 import styles from './propiedad.module.css';
 
 const AMENITY_ICONS = {
-  // Destacados
-  'Piscina':              '🏊',
-  'Piscina climatizada':  '🏊',
-  'Jacuzzi':              '🛁',
-  'Vista al mar':         '🌊',
-  'Vista a la playa':     '🏖️',
-  'Frente al mar':        '🌊',
-  'Acceso a la playa':    '🏖️',
-  'Vista panorámica':     '🌅',
-  // Tecnología
-  'WiFi':                 '📶',
-  'WiFi de alta velocidad': '📶',
-  'Smart TV':             '📺',
-  'TV cable':             '📺',
-  'Netflix':              '🎬',
-  'Proyector':            '🎥',
-  'Consola de videojuegos': '🎮',
-  // Clima
-  'Aire acondicionado':   '❄️',
-  'Calefacción':          '🔥',
-  'Ventilador de techo':  '🌀',
-  'Chimenea':             '🔥',
-  // Cocina
-  'Cocina equipada':      '🍳',
-  'Cocina completa':      '🍳',
-  'Microondas':           '📡',
-  'Lavavajillas':         '🫧',
-  'Cafetera':             '☕',
-  'Nespresso':            '☕',
-  'Heladera':             '🧊',
-  'Freezer':              '🧊',
-  'Horno':                '🫕',
-  'Parrillero':           '🔥',
-  'BBQ':                  '🔥',
-  // Lavandería
-  'Lavarropas':           '🫧',
-  'Lavadora':             '🫧',
-  'Secadora':             '🌬️',
-  'Plancha':              '👔',
-  // Exteriores
-  'Jardín':               '🌿',
-  'Terraza':              '🏡',
-  'Balcón':               '🏡',
-  'Patio':                '🌳',
-  'Deck':                 '🪵',
-  'Pérgola':              '🌿',
-  'Ducha exterior':       '🚿',
-  'Fogón':                '🔥',
-  'Mesa de ping pong':    '🏓',
-  'Hamaca':               '🌴',
-  // Transporte
-  'Estacionamiento':      '🚗',
-  'Garage':               '🏠',
-  'Estacionamiento privado': '🚗',
-  // Familia / mascotas
-  'Apto mascotas':        '🐾',
-  'Cuna':                 '🛏️',
-  'Silla alta bebé':      '👶',
-  'Juguetes':             '🧸',
-  'Piscina para niños':   '🏊',
-  // Seguridad
-  'Caja fuerte':          '🔒',
-  'Alarma':               '🚨',
-  'Cámaras exteriores':   '📷',
-  'Detector de humo':     '🚒',
-  'Extintor':             '🧯',
-  // Acceso
-  'Check-in autónomo':    '🔑',
-  'Portero eléctrico':    '🔔',
-  'Accesible':            '♿',
-  // Trabajo
-  'Escritorio':           '💻',
-  'Lugar de trabajo':     '💼',
-  // Default
-  'default':              '✓',
+  'Piscina': '🏊', 'Piscina climatizada': '🏊', 'Jacuzzi': '🛁',
+  'Vista al mar': '🌊', 'Vista a la playa': '🏖️', 'Frente al mar': '🌊',
+  'Acceso a la playa': '🏖️', 'Vista panorámica': '🌅',
+  'WiFi': '📶', 'WiFi de alta velocidad': '📶', 'Smart TV': '📺',
+  'TV cable': '📺', 'Netflix': '🎬', 'Proyector': '🎥',
+  'Consola de videojuegos': '🎮', 'Parlante Bluetooth': '🎵',
+  'USB / carga inalámbrica': '🔌',
+  'Aire acondicionado': '❄️', 'Calefacción central': '🔥',
+  'Calefacción a leña': '🔥', 'Chimenea': '🔥',
+  'Ventilador de techo': '🌀', 'Estufa eléctrica': '🔥',
+  'Cocina equipada': '🍳', 'Cocina completa': '🍳',
+  'Microondas': '📡', 'Lavavajillas': '🫧', 'Cafetera': '☕',
+  'Nespresso': '☕', 'Heladera': '🧊', 'Freezer': '🧊',
+  'Horno': '🫕', 'Tostadora': '🍞', 'Utensilios de cocina': '🥘',
+  'Especias básicas': '🧂',
+  'Jardín': '🌿', 'Terraza': '🏡', 'Balcón': '🏡', 'Patio': '🌳',
+  'Deck': '🪵', 'Pérgola': '🌿', 'Parrillero': '🔥', 'BBQ': '🔥',
+  'Fogón': '🔥', 'Ducha exterior': '🚿', 'Hamaca': '🌴',
+  'Mesa de ping pong': '🏓', 'Reposeras': '🪑', 'Sombrilla': '⛱️',
+  'Estacionamiento': '🚗', 'Estacionamiento privado': '🚗',
+  'Garage': '🏠', 'Portero eléctrico': '🔔',
+  'Check-in autónomo': '🔑', 'Acceso 24hs': '⏰',
+  'Ropa de cama incluida': '🛏️', 'Toallas incluidas': '🛁',
+  'Almohadas extra': '😴', 'Placard': '👔', 'Percheros': '🪝',
+  'Caja fuerte': '🔒', 'Black-out (cortinas oscuras)': '🌑',
+  'Lavarropas': '🫧', 'Secadora': '🌬️', 'Plancha': '👔',
+  'Tendedero': '🧺', 'Lavandería compartida': '🫧',
+  'Apto mascotas': '🐾', 'Cuna': '🛏️', 'Silla alta bebé': '👶',
+  'Juguetes': '🧸', 'Piscina para niños': '🏊', 'Cercas de seguridad': '🔒',
+  'Alarma': '🚨', 'Cámaras exteriores': '📷',
+  'Detector de humo': '🚒', 'Extintor': '🧯',
+  'Botiquín de primeros auxilios': '🏥', 'Detector de CO': '⚠️',
+  'Escritorio': '💻', 'Lugar de trabajo': '💼', 'Gimnasio': '💪',
+  'Sauna': '🧖', 'Bicicletas': '🚲', 'Tablas de surf': '🏄',
+  'Accesible silla de ruedas': '♿', 'Baño adaptado': '♿',
+  'Rampa de acceso': '♿', 'Sin escaleras': '♿',
+  'default': '✓',
 };
 
 function getAmenityIcon(name) {
   return AMENITY_ICONS[name] || AMENITY_ICONS['default'];
 }
 
+// ── Componente Calendario público ──────────────────────────
+function CalendarioDisponibilidad({ fechasOcupadas = [] }) {
+  const hoy = new Date();
+  const [mesActual, setMesActual] = useState(new Date(hoy.getFullYear(), hoy.getMonth(), 1));
+
+  const year = mesActual.getFullYear();
+  const month = mesActual.getMonth();
+  const diasEnMes = new Date(year, month + 1, 0).getDate();
+  const primerDia = new Date(year, month, 1).getDay();
+
+  const meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio',
+    'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  const diasSemana = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+
+  const esFechaOcupada = (dia) => {
+    const fecha = `${year}-${String(month + 1).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
+    return fechasOcupadas.includes(fecha);
+  };
+
+  const esPasado = (dia) => {
+    const fecha = new Date(year, month, dia);
+    const hoyStart = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
+    return fecha < hoyStart;
+  };
+
+  const esHoy = (dia) =>
+    hoy.getFullYear() === year && hoy.getMonth() === month && hoy.getDate() === dia;
+
+  // No permitir navegar a meses anteriores al actual
+  const puedeRetroceder = year > hoy.getFullYear() || month > hoy.getMonth();
+
+  const mesAnterior = () => {
+    if (!puedeRetroceder) return;
+    setMesActual(new Date(year, month - 1, 1));
+  };
+  const mesSiguiente = () => setMesActual(new Date(year, month + 1, 1));
+
+  const celdas = [];
+  for (let i = 0; i < primerDia; i++) {
+    celdas.push(<div key={`e-${i}`} className={styles.calCelda} />);
+  }
+  for (let dia = 1; dia <= diasEnMes; dia++) {
+    const ocupado = esFechaOcupada(dia);
+    const pasado = esPasado(dia);
+    const hoyDia = esHoy(dia);
+
+    let clase = styles.calCelda;
+    if (pasado) clase += ` ${styles.calPasado}`;
+    else if (ocupado) clase += ` ${styles.calOcupado}`;
+    else clase += ` ${styles.calDisponible}`;
+    if (hoyDia) clase += ` ${styles.calHoy}`;
+
+    celdas.push(
+      <div key={dia} className={clase}>
+        {dia}
+        {!pasado && (
+          <span className={styles.calDot}>
+            {ocupado ? '●' : ''}
+          </span>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div className={styles.calendario}>
+      {/* Navegación */}
+      <div className={styles.calNav}>
+        <button
+          onClick={mesAnterior}
+          className={styles.calNavBtn}
+          disabled={!puedeRetroceder}
+        >
+          ‹
+        </button>
+        <h3 className={styles.calMes}>{meses[month]} {year}</h3>
+        <button onClick={mesSiguiente} className={styles.calNavBtn}>›</button>
+      </div>
+
+      {/* Días de la semana */}
+      <div className={styles.calGrid}>
+        {diasSemana.map(d => (
+          <div key={d} className={styles.calDiaSemana}>{d}</div>
+        ))}
+        {celdas}
+      </div>
+
+      {/* Leyenda */}
+      <div className={styles.calLeyenda}>
+        <div className={styles.calLeyendaItem}>
+          <div className={`${styles.calLeyendaDot} ${styles.dotDisponible}`} />
+          <span>Disponible</span>
+        </div>
+        <div className={styles.calLeyendaItem}>
+          <div className={`${styles.calLeyendaDot} ${styles.dotOcupado}`} />
+          <span>Ocupado</span>
+        </div>
+        <div className={styles.calLeyendaItem}>
+          <div className={`${styles.calLeyendaDot} ${styles.dotPasado}`} />
+          <span>Pasado</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Página principal ────────────────────────────────────────
 export default function PropiedadDetalle() {
   const { id } = useParams();
   const router = useRouter();
@@ -115,16 +184,17 @@ export default function PropiedadDetalle() {
     cargar();
   }, [id]);
 
-  // Cerrar galería con Escape
   useEffect(() => {
+    if (!galeriaAbierta) return;
+    const fotos = propiedad?.imagenes || [];
     const handleKey = (e) => {
       if (e.key === 'Escape') setGaleriaAbierta(false);
-      if (e.key === 'ArrowRight' && galeriaAbierta) setFotoActiva(p => (p + 1) % fotos.length);
-      if (e.key === 'ArrowLeft' && galeriaAbierta) setFotoActiva(p => (p - 1 + fotos.length) % fotos.length);
+      if (e.key === 'ArrowRight') setFotoActiva(p => (p + 1) % fotos.length);
+      if (e.key === 'ArrowLeft') setFotoActiva(p => (p - 1 + fotos.length) % fotos.length);
     };
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
-  }, [galeriaAbierta]);
+  }, [galeriaAbierta, propiedad]);
 
   if (loading) {
     return (
@@ -153,11 +223,12 @@ export default function PropiedadDetalle() {
     : [];
 
   const tieneFotos = fotos.length > 0;
+  const fechasOcupadas = propiedad.fechasOcupadas || [];
 
   return (
     <div className={styles.page}>
 
-      {/* ── Galería lightbox ── */}
+      {/* Lightbox */}
       {galeriaAbierta && tieneFotos && (
         <div className={styles.lightbox} onClick={() => setGaleriaAbierta(false)}>
           <button className={styles.lightboxClose} onClick={() => setGaleriaAbierta(false)}>✕</button>
@@ -179,14 +250,10 @@ export default function PropiedadDetalle() {
         </div>
       )}
 
-      {/* ── GALERÍA PRINCIPAL ── */}
+      {/* Galería principal */}
       {tieneFotos ? (
         <div className={styles.galeria}>
-          {/* Foto principal */}
-          <div
-            className={styles.galeriaMain}
-            onClick={() => { setFotoActiva(0); setGaleriaAbierta(true); }}
-          >
+          <div className={styles.galeriaMain} onClick={() => { setFotoActiva(0); setGaleriaAbierta(true); }}>
             <img src={fotos[0]} alt={propiedad.titulo} />
             {fotos.length > 1 && (
               <button
@@ -197,7 +264,6 @@ export default function PropiedadDetalle() {
               </button>
             )}
           </div>
-          {/* Miniaturas — max 4 a la derecha */}
           {fotos.length > 1 && (
             <div className={styles.galeriaThumbs}>
               {fotos.slice(1, 5).map((url, i) => (
@@ -222,7 +288,7 @@ export default function PropiedadDetalle() {
         </div>
       )}
 
-      {/* ── CONTENIDO ── */}
+      {/* Contenido */}
       <div className={styles.contenido}>
         <div className={styles.columnaIzq}>
 
@@ -235,7 +301,7 @@ export default function PropiedadDetalle() {
             <span>{propiedad.titulo}</span>
           </nav>
 
-          {/* Título y ubicación */}
+          {/* Encabezado */}
           <div className={styles.encabezado}>
             <div className={styles.badges}>
               {propiedad.tipoPropiedad && (
@@ -254,7 +320,7 @@ export default function PropiedadDetalle() {
               { icon: '🛏️', label: 'Dormitorios', value: propiedad.dormitorios },
               { icon: '🛌', label: 'Camas', value: propiedad.camas },
               { icon: '🚿', label: 'Baños', value: propiedad.banos },
-            ].map(item => item.value && (
+            ].filter(i => i.value).map(item => (
               <div key={item.label} className={styles.capacidadItem}>
                 <span className={styles.capacidadIcon}>{item.icon}</span>
                 <div>
@@ -292,6 +358,17 @@ export default function PropiedadDetalle() {
 
           <hr className={styles.divider} />
 
+          {/* Calendario de disponibilidad */}
+          <div className={styles.seccion}>
+            <h2 className={styles.seccionTitulo}>Disponibilidad</h2>
+            <p style={{ fontSize: '0.9rem', color: 'var(--color-text-muted)', marginBottom: '1rem' }}>
+              Los días en rojo ya están reservados. Para consultar fechas específicas contactanos por WhatsApp.
+            </p>
+            <CalendarioDisponibilidad fechasOcupadas={fechasOcupadas} />
+          </div>
+
+          <hr className={styles.divider} />
+
           {/* Info adicional */}
           <div className={styles.seccion}>
             <h2 className={styles.seccionTitulo}>Información adicional</h2>
@@ -305,7 +382,9 @@ export default function PropiedadDetalle() {
               {propiedad.temporada && (
                 <div className={styles.infoItem}>
                   <span className={styles.infoLabel}>Temporada</span>
-                  <span className={styles.infoValue} style={{ textTransform: 'capitalize' }}>{propiedad.temporada}</span>
+                  <span className={styles.infoValue} style={{ textTransform: 'capitalize' }}>
+                    {propiedad.temporada}
+                  </span>
                 </div>
               )}
               {propiedad.fechaPublicacion && (
@@ -323,7 +402,7 @@ export default function PropiedadDetalle() {
 
         </div>
 
-        {/* ── COLUMNA DERECHA — Tarjeta de reserva ── */}
+        {/* Columna derecha — tarjeta fija */}
         <div className={styles.columnaDer}>
           <div className={styles.reservaCard}>
             <div className={styles.reservaPrecio}>
@@ -368,7 +447,6 @@ export default function PropiedadDetalle() {
             </div>
           </div>
 
-          {/* Volver */}
           <Link href="/#propiedades" className={styles.btnVolver}>
             ← Ver más propiedades
           </Link>
