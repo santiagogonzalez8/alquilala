@@ -406,6 +406,18 @@ export default function PropiedadDetalle() {
           setError(true);
         } else {
           setPropiedad(data);
+
+// Trackear vista de propiedad en Google Analytics
+if (typeof window !== 'undefined' && window.gtag) {
+  window.gtag('event', 'view_item', {
+    item_id: id,
+    item_name: data.titulo,
+    item_category: data.tipoPropiedad || 'Propiedad',
+    item_location: data.ubicacion,
+    price: Number(data.precioPorNoche) || 0,
+    currency: 'USD',
+  })
+}
         }
       } catch {
         setError(true);

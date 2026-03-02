@@ -201,23 +201,36 @@ export default function Home() {
           {propiedades.length > 0 ? (
             <StaggerGrid className={styles.propiedadesGrid}>
               {propiedades.map((prop) => (
-                <Link key={prop.id} href={`/propiedades/${prop.id}`} className={styles.propiedadCard}>
-                  <div
-                    className={styles.propiedadImagen}
-                    style={{
-                      backgroundImage: prop.imagenes?.[0]
-                        ? `url(${prop.imagenes[0]})`
-                        : prop.fotoPrincipal
-                        ? `url(${prop.fotoPrincipal})`
-                        : 'linear-gradient(135deg, #1e3a5f, #2d4a6f)'
-                    }}
-                  >
-                    <span className={styles.propiedadBadge}>Disponible</span>
-                  </div>
-                  <div className={styles.propiedadInfo}>
-                    <h3 className={styles.propiedadTitulo}>{prop.titulo}</h3>
-                    <p className={styles.propiedadUbicacion}>📍 {prop.ubicacion}</p>
-                    <div className={styles.propiedadDetalles}>
+                <Link
+  key={prop.id}
+  href={`/propiedades/${prop.id}`}
+  className={styles.propiedadCard}
+  onClick={() => {
+    if (typeof window !== 'undefined' && window.gtag) {
+      window.gtag('event', 'select_item', {
+        item_id: prop.id,
+        item_name: prop.titulo,
+        item_location: prop.ubicacion,
+      })
+    }
+  }}
+>
+  <div
+    className={styles.propiedadImagen}
+    style={{
+      backgroundImage: prop.imagenes?.[0]
+        ? `url(${prop.imagenes[0]})`
+        : prop.fotoPrincipal
+        ? `url(${prop.fotoPrincipal})`
+        : 'linear-gradient(135deg, #1e3a5f, #2d4a6f)'
+    }}
+  >
+    <span className={styles.propiedadBadge}>Disponible</span>
+  </div>
+  <div className={styles.propiedadInfo}>
+    <h3 className={styles.propiedadTitulo}>{prop.titulo}</h3>
+    <p className={styles.propiedadUbicacion}>📍 {prop.ubicacion}</p>
+    <div className={styles.propiedadDetalles}>
                       <span>👥 {prop.huespedes} huéspedes</span>
                       <span>🛏️ {prop.dormitorios} dorm.</span>
                       <span>🚿 {prop.banos} baños</span>
