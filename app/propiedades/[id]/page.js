@@ -617,17 +617,46 @@ if (typeof window !== 'undefined' && window.gtag) {
 
             <hr className={styles.reservaDivider} />
 
-            {/* Botón WhatsApp */}
-            <a
-              href={`https://wa.me/59895532294?text=${buildWAMsg()}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={styles.btnReserva}
-            >
-              💬 {fechaInicio && fechaFin ? 'Reservar por WhatsApp' : 'Consultar por WhatsApp'}
-            </a>
-
-            <div className={styles.reservaGestionado}>
+            {/* Botón pagar — solo si hay fechas seleccionadas */}
+{fechaInicio && fechaFin ? (
+  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '1rem' }}>
+    <BtnPagar
+      propiedad={propiedad}
+      fechaInicio={fechaInicio}
+      fechaFin={fechaFin}
+      noches={noches}
+      total={total}
+    />
+    <a
+      href={`https://wa.me/59895532294?text=${buildWAMsg()}`}
+      target="_blank"
+      rel="noopener noreferrer"
+      style={{
+        display: 'block',
+        background: 'white',
+        color: '#25D366',
+        border: '2px solid #25D366',
+        textAlign: 'center',
+        padding: '0.75rem',
+        borderRadius: '8px',
+        fontWeight: 700,
+        fontSize: '0.9rem',
+        textDecoration: 'none',
+      }}
+    >
+      💬 Consultar por WhatsApp
+    </a>
+  </div>
+) : (
+  <a
+    href={`https://wa.me/59895532294?text=${buildWAMsg()}`}
+    target="_blank"
+    rel="noopener noreferrer"
+    className={styles.btnReserva}
+  >
+    💬 Seleccioná fechas para reservar
+  </a>
+)}
               <span>🏆</span>
               <div>
                 <strong>Gestionado por Alquilala</strong>
