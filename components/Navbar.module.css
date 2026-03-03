@@ -28,9 +28,10 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 1rem;
 }
 
-/* Logo — pegado a la izquierda */
+/* Logo */
 .logo {
   display: flex;
   align-items: center;
@@ -40,6 +41,17 @@
   font-size: 1.4rem;
   font-weight: 700;
   letter-spacing: -0.5px;
+  flex-shrink: 0;
+}
+
+.logoText {
+  flex-shrink: 0;
+}
+
+/* Search bar en el centro */
+.navSearch {
+  flex: 1;
+  max-width: 600px;
 }
 
 /* Links centrales */
@@ -61,14 +73,15 @@
   color: var(--color-primary);
 }
 
-/* Lado derecho — pegado a la derecha */
+/* Lado derecho */
 .navRight {
   display: flex;
   align-items: center;
   gap: 1rem;
+  flex-shrink: 0;
 }
 
-/* Botones de autenticación (visitante) */
+/* Botones de autenticación */
 .authButtons {
   display: flex;
   align-items: center;
@@ -359,6 +372,12 @@
 /* ============================================
    RESPONSIVE
    ============================================ */
+@media (max-width: 900px) {
+  .navSearch {
+    display: none;
+  }
+}
+
 @media (max-width: 768px) {
   .navInner {
     padding: 0 0.75rem;

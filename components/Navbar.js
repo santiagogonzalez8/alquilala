@@ -2,17 +2,24 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { auth, firestoreGet } from '@/lib/firebase'
 import { signOut } from 'firebase/auth'
 import { useRouter } from 'next/navigation'
 import { isAdmin } from '@/lib/adminConfig'
+import SearchBar from '@/components/SearchBar'
 import styles from './Navbar.module.css'
 
 export default function Navbar({ user }) {
   const router = useRouter()
+  const pathname = usePathname()
   const [menuOpen, setMenuOpen] = useState(false)
   const [userData, setUserData] = useState(null)
   const [scrolled, setScrolled] = useState(false)
+
+  // Mostrar search bar en todas las páginas excepto home, login, admin y buscar
+  const mostrarSearch = !['/login', '/buscar'].includes(pathname) &&
+    !pathname?.startsWith('/admin')
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20)
@@ -63,8 +70,10 @@ export default function Navbar({ user }) {
 
   return (
     <>
-      <nav className={`${styles.navbar} ${scrolled ? styles.scrolled : ''}`}>
+      <nav className={`${styles.navbar} ${scrolled ? styles.scrolled : ''} ${mostrarSearch ? styles.navbarConSearch : ''}`}>
         <div className={styles.navInner}>
+
+          {/* Logo */}
           <Link href="/" className={styles.logo}>
             <svg width="36" height="36" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
               <rect x="10" y="20" width="20" height="16" fill="#1e3a5f"/>
@@ -73,16 +82,27 @@ export default function Navbar({ user }) {
               <line x1="16" y1="28" x2="24" y2="28" stroke="#1e3a5f" strokeWidth="0.8"/>
               <line x1="20" y1="24" x2="20" y2="32" stroke="#1e3a5f" strokeWidth="0.8"/>
             </svg>
-            <span>alquilala</span>
+            <span className={styles.logoText}>alquilala</span>
           </Link>
 
-          <div className={styles.navLinks}>
-            <Link href="/#como-funciona" className={styles.navLink}>Cómo funciona</Link>
-            <Link href="/#servicios" className={styles.navLink}>Servicios</Link>
-            <Link href="/#propiedades" className={styles.navLink}>Propiedades</Link>
-            <Link href="/soporte" className={styles.navLink}>Contacto</Link>
-          </div>
+          {/* Search bar en el centro — solo en ciertas páginas */}
+          {mostrarSearch && (
+            <div className={styles.navSearch}>
+              <SearchBar />
+            </div>
+          )}
 
+          {/* Links desktop — solo si no hay search */}
+          {!mostrarSearch && (
+            <div className={styles.navLinks}>
+              <Link href="/#como-funciona" className={styles.navLink}>Cómo funciona</Link>
+              <Link href="/#servicios" className={styles.navLink}>Servicios</Link>
+              <Link href="/#propiedades" className={styles.navLink}>Propiedades</Link>
+              <Link href="/soporte" className={styles.navLink}>Contacto</Link>
+            </div>
+          )}
+
+          {/* Derecha */}
           <div className={styles.navRight}>
             {user ? (
               <>
@@ -114,6 +134,7 @@ export default function Navbar({ user }) {
         </div>
       </nav>
 
+      {/* Menú hamburguesa */}
       {menuOpen && (
         <>
           <div className={styles.overlay} onClick={() => setMenuOpen(false)} />
@@ -155,6 +176,9 @@ export default function Navbar({ user }) {
 
               <div className={styles.divider} />
 
+              <Link href="/buscar" className={styles.menuItem} onClick={() => setMenuOpen(false)}>
+                <span>🔍</span> Buscar Propiedades
+              </Link>
               <Link href="/ayuda" className={styles.menuItem} onClick={() => setMenuOpen(false)}>
                 <span>❓</span> Ayuda
               </Link>
