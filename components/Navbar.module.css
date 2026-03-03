@@ -409,3 +409,47 @@
     font-size: 1.2rem;
   }
 }
+/* Botón idioma/moneda */
+.btnIdiomaMoneda {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: white;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  padding: 0.45rem 0.875rem;
+  cursor: pointer;
+  font-family: inherit;
+  transition: box-shadow 0.2s;
+  font-size: 0.85rem;
+}
+
+.btnIdiomaMoneda:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.btnIdiomaFlag {
+  font-size: 1rem;
+}
+
+.btnMonedaCodigo {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+/* Search en navbar */
+.navSearch {
+  flex: 1;
+  max-width: 600px;
+}
+
+.logoText {
+  flex-shrink: 0;
+}
+
+@media (max-width: 900px) {
+  .navSearch {
+    display: none;
+  }
+}
