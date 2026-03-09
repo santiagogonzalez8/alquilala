@@ -836,3 +836,38 @@
   .lightboxLeft { left: 0.5rem; }
   .lightboxRight { right: 0.5rem; }
 }
+/* Fix flechas slider */
+.sliderArrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  font-size: 1.5rem;
+  cursor: pointer !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  transition: all 0.2s;
+  color: var(--color-primary);
+  pointer-events: all !important;
+}
+
+.sliderArrow:hover {
+  background: white;
+  transform: translateY(-50%) scale(1.1);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+}
+
+.sliderLeft {
+  left: 1rem;
+}
+
+.sliderRight {
+  right: 1rem;
+}
