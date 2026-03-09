@@ -1,6 +1,3 @@
-/* Importar CSS de Leaflet */
-@import 'leaflet/dist/leaflet.css';
-
 .mapaWrapper {
   position: relative;
   width: 100%;
